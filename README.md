@@ -31,3 +31,16 @@ A x86 Multitasking lightweight os written in C++
 
 ## Discord server
 https://discord.gg/peb2raJpzD
+
+## Building And Running
+
+Make sure you have following programs installed:
+* i686-elf-gcc (corss-compiler)
+* i686-elf-ld
+* nasm
+* make
+* Qemu x86-64
+* mkisofs
+
+Step 1. Open the project dir
+Step 2. Run make
