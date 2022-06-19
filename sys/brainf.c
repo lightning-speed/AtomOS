@@ -21,7 +21,7 @@ int main(int argc, char *argv[])
 	char *ptr = tape;
 	if (argc < 2)
 	{
-		fprintf("File not found. i.e brainf code.bf");
+		printf("File not found. i.e brainf code.bf");
 		return 1;
 	}
 	filename = argv[1];

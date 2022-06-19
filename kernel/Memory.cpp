@@ -3,7 +3,8 @@
 #include <Serial.h>
 char pages_free[max_pages];
 char pages_size[max_pages];
-
+uint32_t m_start;
+uint32_t m_end;
 uint32_t map_start;
 void mm_init()
 {

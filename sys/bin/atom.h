@@ -3,22 +3,7 @@
 #include <string.h>
 void set_screen(uint32_t type, uint32_t val);
 uint32_t syscall(uint32_t eax, uint32_t ebx, uint32_t ecx, uint32_t edx);
-enum ftype_t
-{
-	dir = 1,
-	file = 2
-};
-typedef struct
-{
-	enum ftype_t type;
-	uintptr_t children[126];
-	uintptr_t parent;
-	char name[32];
-	uint32_t size;
-	char *content;
-	uint32_t cap;
-	char open;
-} fnode;
+
 int get_seconds();
 int get_minutes();
 int get_hours();

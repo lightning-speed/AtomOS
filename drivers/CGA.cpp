@@ -33,6 +33,10 @@ namespace CGA
 		{
 			sx = 0;
 			sy++;
+			if (sx < 80)
+				CGA::setCursorPosition(sx, sy);
+			else
+				CGA::setCursorPosition(0, sy + 1);
 		}
 		if (sy >= 23)
 		{
@@ -66,6 +70,10 @@ namespace CGA
 			{
 				sx = 0;
 				sy++;
+				if (sx < 80)
+					CGA::setCursorPosition(sx, sy);
+				else
+					CGA::setCursorPosition(0, sy + 1);
 			}
 			if (sy >= 24)
 			{

@@ -3,7 +3,11 @@
 #include <stdlib.h>
 #include <stdint.h>
 
-
-int main(){
- printf("%i",stderr==2);
+int main()
+{
+	char *buffer = "RR";
+	for (int i = 0;; i++)
+	{
+		getc(stdin);
+	}
 }

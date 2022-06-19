@@ -24,6 +24,7 @@ int main(int argc, char **argv)
 	cbuffer = malloc(2048);
 	printf("Atom cmd [Version 1.0.0]\nCopyright (c) 2022 Lightning-Speed.  All rights reserved.\n\nType help for commands(help is not a command btw)\n");
 	set_screen(0, 0x0f);
+	putchar('\n');
 	while (1)
 	{
 		for (int i = 0; i < 2048; i++)
@@ -31,10 +32,9 @@ int main(int argc, char **argv)
 			cbuffer[i] = 0;
 		}
 		set_screen(0, 0x0e);
-		printf("\nroot@atom# ");
+		printf("root@atom# ");
 		set_screen(0, 0x0f);
 		scanf("%s", cbuffer);
-		putchar('\n');
 		int res = system(cbuffer);
 		if (strlen(cbuffer) != 0)
 			if (!strcmp(cbuffer, "uwufetch"))
@@ -52,11 +52,12 @@ int main(int argc, char **argv)
 				set_screen(4, 1);
 				printf("OS: Atom OS");
 				set_screen(4, -6);
+				putchar('\n');
 			}
 			else if (!strcmp(cbuffer, "ls"))
 			{
 				char *path = cbuffer + strlen(cbuffer) + 1;
-				if (path == NULL)
+				if (strlen(path) == 0)
 					ls_path(".");
 				else
 				{
@@ -87,7 +88,7 @@ int main(int argc, char **argv)
 			}
 			else if (res == 0)
 			{
-				printf("%s%s", "command not found: ", cbuffer);
+				printf("%s%s\n", "command not found: ", cbuffer);
 			}
 	}
 }

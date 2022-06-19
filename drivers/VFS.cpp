@@ -113,7 +113,7 @@ namespace VFS
 	}
 	fnode *open(char *path, char *prot)
 	{
-		if (!strcmp(path, ".") || !strcmp(path, ""))
+		if (!strcmp(path, "."))
 		{
 			return vfs_node;
 		}

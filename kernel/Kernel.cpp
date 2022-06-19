@@ -51,6 +51,7 @@ extern "C" int kmain(uint32_t mb_sig, uint32_t mb_addr)
 		//after checking the signature and address
 		Serial::log("Multiboot Verified\n");
 		struct multiboot_info *mbinfo = (multiboot_info *)mb_addr;
+
 		multiboot_module_t *mod = (multiboot_module_t *)mbinfo->mods_addr;
 		Ramdisk::start = (char *)mod->mod_start;
 		FB::init((char *)(mbinfo->framebuffer_addr), mbinfo->framebuffer_width, mbinfo->framebuffer_height, mbinfo->framebuffer_pitch);
@@ -72,8 +73,6 @@ void kernel_stage2()
 	//Initfs will be mounted in the ramdisk init
 	Ramdisk::init();
 	CGA::print("Filesystem Mounted [Done]\n", 0x09);
-	fnode *f = VFS::open("rust_is_eww/true", "w");
-	VFS::close(f);
 	CGA::clearScreen();
 	char *env[10] = {
 			"R"};
