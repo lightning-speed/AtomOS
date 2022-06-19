@@ -42,5 +42,5 @@ Make sure you have following programs installed:
 * Qemu x86-64
 * mkisofs
 
-Step 1. Open the project dir
+Step 1. Open the project dir<br>
 Step 2. Run make
