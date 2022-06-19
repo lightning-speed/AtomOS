@@ -13,9 +13,9 @@ namespace Sys
 	void exit(register_t *regs)
 	{
 		if (Scheduler::getCurrentThread()->parent != nullptr)
-			CGA::print("\nProcess [" + ((process_t *)(Scheduler::getCurrentThread()->parent))->name + "]: Killed with exit code " + (int)regs->ebx + "\n", 0x0e);
+			CGA::print("\nProcess [" + ((process_t *)(Scheduler::getCurrentThread()->parent))->name + "]: Killed with exit code " + (int)regs->ebx + "\n", 0x0d);
 		else
-			CGA::print((String) "\nProcess [unknown]: Killed with exit code " + (int)regs->ebx + "\n", 0x0e);
+			CGA::print((String) "\nProcess [unknown]: Killed with exit code " + (int)regs->ebx + "\n", 0x0d);
 		Runtime::kill((process_t *)Scheduler::getCurrentThread()->parent);
 	}
 	void write(register_t *regs)
@@ -34,7 +34,17 @@ namespace Sys
 				CGA::printChar((char)((int)data));
 			}
 			break;
-
+		case 3:
+			CGA::screenColor = 0x0c;
+			if (len != 0)
+				for (uint32_t i = 0; i < len; i++)
+					CGA::print((char)data[i]);
+			else
+			{
+				CGA::printChar((char)((int)data));
+			}
+			CGA::screenColor = 0x0f;
+			break;
 		default:
 			if (len == 0)
 				VFS::write((fnode *)stream, (char)((int)data));
@@ -51,6 +61,8 @@ namespace Sys
 		{
 		case 0:
 			regs->ecx = ((process_t *)Scheduler::getCurrentThread()->parent)->keyboardHandler.fetch();
+			if (regs->ecx != 0 && regs->ecx != '\b')
+				CGA::printChar(regs->ecx);
 			break;
 		case 1:
 			break;
