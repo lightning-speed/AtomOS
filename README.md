@@ -29,3 +29,5 @@ A x86 Multitasking lightweight os written in C++
 - [x] PS/2 Keyboard
 - [x] COM 
 
+## Discord server
+https://discord.gg/peb2raJpzD
