@@ -22,7 +22,7 @@
 void randomize_mem(uint32_t from, uint32_t till);
 void kernel_stage2();
 process_t *kernel_stage2proc;
-
+multiboot_module_t *kmod;
 extern "C" int kmain(uint32_t mb_sig, uint32_t mb_addr)
 {
 	//As Malloc is required everywhere we initalize it first
@@ -53,6 +53,8 @@ extern "C" int kmain(uint32_t mb_sig, uint32_t mb_addr)
 		struct multiboot_info *mbinfo = (multiboot_info *)mb_addr;
 
 		multiboot_module_t *mod = (multiboot_module_t *)mbinfo->mods_addr;
+
+		kmod = (multiboot_module_t *)mbinfo->mods_addr + 1;
 		Ramdisk::start = (char *)mod->mod_start;
 		FB::init((char *)(mbinfo->framebuffer_addr), mbinfo->framebuffer_width, mbinfo->framebuffer_height, mbinfo->framebuffer_pitch);
 	}
@@ -72,11 +74,12 @@ void kernel_stage2()
 	VFS::init();
 	//Initfs will be mounted in the ramdisk init
 	Ramdisk::init();
+	fnode *kf = VFS::open("kernel.elf", "w");
+	VFS::setBuffer(kf, (char *)kmod->mod_start, (uint32_t)kmod->mod_end - (uint32_t)kmod->mod_start);
+	VFS::close(kf);
 	CGA::print("Filesystem Mounted [Done]\n", 0x09);
 	CGA::clearScreen();
-	char *env[10] = {
-			"R"};
-	Runtime::exec("cmd.exe", 0, nullptr, env);
+	Runtime::exec("cmd.exe", 0, nullptr, nullptr);
 	Scheduler::killProcess(kernel_stage2proc);
 	while (1)
 	{
