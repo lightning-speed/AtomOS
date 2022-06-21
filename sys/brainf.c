@@ -17,11 +17,11 @@ int main(int argc, char *argv[])
 {
 	FILE *fp;
 	char *filename;
-	char tape[3000] = {0};
+	static char tape[30000] = {0};
 	char *ptr = tape;
 	if (argc < 2)
 	{
-		printf("File not found. i.e brainf code.bf");
+		fprintf(stderr, "File not found. i.e brainf code.bf");
 		return 1;
 	}
 	filename = argv[1];

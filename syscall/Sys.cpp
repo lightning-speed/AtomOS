@@ -34,7 +34,7 @@ namespace Sys
 				CGA::printChar((char)((int)data));
 			}
 			break;
-		case 3:
+		case 2:
 			CGA::screenColor = 0x0c;
 			if (len != 0)
 				for (uint32_t i = 0; i < len; i++)
@@ -59,13 +59,12 @@ namespace Sys
 		uint32_t stream = regs->ebx;
 		switch (stream)
 		{
-		case 0:
+		case 1:
 			regs->ecx = ((process_t *)Scheduler::getCurrentThread()->parent)->keyboardHandler.fetch();
 			if (regs->ecx != 0 && regs->ecx != '\b')
 				CGA::printChar(regs->ecx);
 			break;
-		case 1:
-			break;
+
 		default:
 			if (regs->edx == 0)
 				regs->ecx = VFS::read((fnode *)stream, regs->ecx);
