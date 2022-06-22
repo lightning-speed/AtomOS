@@ -1,16 +1,16 @@
 # AtomOS
 A x86 Multitasking lightweight os written in C++ 
 
-![image](https://user-images.githubusercontent.com/82322282/174494812-81b63d86-1b32-4584-b4a9-1d7a97152636.png)
+![image](https://user-images.githubusercontent.com/82322282/175097842-71cd6e9b-f4b2-48a3-ab2d-1de0cb26ee03.png)
+
 
 ## Running Brain Fuck
 
-![image](https://user-images.githubusercontent.com/82322282/174494847-96a28935-43fb-40eb-80a0-96c824577285.png)
+![image](https://user-images.githubusercontent.com/82322282/175097969-281d8292-a97f-4133-92fe-680cada6c491.png)
 
 ## Running Gnome Lang
 
-![image](https://user-images.githubusercontent.com/82322282/174841030-94f7a470-943a-48be-b21a-63f937c75e48.png)
-
+![image](https://user-images.githubusercontent.com/82322282/175098119-c987dedd-b4c9-430a-bfdf-3fae82002f08.png)
 
 ## [LICENSE](LICENSE)
 
