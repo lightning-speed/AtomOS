@@ -23,6 +23,7 @@ A x86 Multitasking lightweight os written in C++
 - [x] Scheduler
 - [x] Syscalls
 - [x] VFS
+- [x] Framebuffer
 - [x] ELF Runtime
 - [x] libc
 - [x] Heap
