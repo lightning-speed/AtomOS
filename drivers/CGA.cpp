@@ -1,16 +1,34 @@
 #include <CGA.h>
 #include <IO.h>
+#include <FB.h>
 #include <Memory.h>
 int CGA::sx = 0;
 int CGA::sy = 0;
 char CGA::screenColor = 0x0f;
 bool lockedC = 0;
+int colors[] = {
+		((0 << 24) | (0 << 16) | (0 << 8) | 255),
+		((0 << 24) | (0 << 16) | (255 << 8) | 255),
+		((0 << 24) | (0 << 16) | (0 << 8) | 255),
+		((0 << 24) | (0 << 16) | (0 << 8) | 255),
+		((0 << 24) | (0 << 16) | (0 << 8) | 255),
+		((0 << 24) | (0 << 16) | (0 << 8) | 255),
+		((0 << 24) | (0 << 16) | (0 << 8) | 255),
+		((0 << 24) | (0 << 16) | (0 << 8) | 255),
+		((0 << 24) | (0 << 16) | (0 << 8) | 255),
+		((255 << 24) | (60 << 16) | (0 << 8) | 255),
+		((0 << 24) | (0 << 16) | (0 << 8) | 255),
+		((0 << 24) | (0 << 16) | (0 << 8) | 255),
+		((0 << 24) | (255 << 16) | (100 << 8) | 100),
+		((255 << 24) | (250 << 16) | (40 << 8) | 170),
+		((255 << 24) | (255 << 16) | (255 << 8) | 0),
+		((255 << 24) | (255 << 16) | (255 << 8) | 255)};
 namespace CGA
 {
 	void printChar(char c, int x, int y)
 	{
-		((char *)0xb8000)[x * 2 + (y * 160)] = c;
-		((char *)0xb8000)[x * 2 + (y * 160) + 1] = CGA::screenColor;
+
+		FB::drawTerminalAsciiChar(x, y, c, colors[CGA::screenColor]);
 		if (x < 80)
 			CGA::setCursorPosition(x + 1, y);
 		else
@@ -38,10 +56,9 @@ namespace CGA
 			else
 				CGA::setCursorPosition(0, sy + 1);
 		}
-		if (sy >= 23)
+		if (sy >= 26)
 		{
-			memcpy((char *)0xB8000, (char *)0xB8000 + 160, 25 * 160);
-			sy--;
+			clearScreen();
 		}
 	}
 	void print(String s, char color)
@@ -75,24 +92,17 @@ namespace CGA
 				else
 					CGA::setCursorPosition(0, sy + 1);
 			}
-			if (sy >= 24)
+			if (sy >= 26)
 			{
-				memcpy((char *)0xB8000, (char *)0xB8000 + 160, 25 * 160);
-				sy--;
+				clearScreen();
 			}
 		}
 	}
 
 	void clearScreen()
 	{
-		for (int i = 0; i < 160 * 25; i += 2)
-		{
-			((char *)0xB8000)[i] = 0;
-		}
-		for (int i = 1; i < 160 * 25; i += 2)
-		{
-			((char *)0xB8000)[i] = 0x0f;
-		}
+		FB::clearScreen();
+
 		sx = 0;
 		sy = 0;
 	}
@@ -116,7 +126,7 @@ namespace CGA
 			sy--;
 			sx = 80;
 		}
-		printChar(0, sx, sy);
+		printChar(' ', sx, sy);
 		if (sx < 80)
 			CGA::setCursorPosition(sx, sy);
 		else

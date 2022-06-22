@@ -98,7 +98,7 @@ char *malloc(uint32_t size)
 void free(char *addr)
 {
 	uint32_t page_number = addr_to_page_index(addr);
-	if (page_number >= max_pages || (uint32_t)addr < map_start)
+	if (page_number >= max_pages || (uint32_t)addr < map_start || (uint32_t)addr > (max_pages * mm_page_size) + (uint32_t)map_start)
 	{
 		return;
 	}

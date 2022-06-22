@@ -12,5 +12,5 @@ all:
 	cp ../disk/ramdisk  ./
 	-rm -f $(OUTPUT_FILE)
 	$(FM) $(FM_FLAGS) -o $(OUTPUT_FILE) ./ $(LIMINE_PATH)
-	$(LID) $(OUTPUT_FILE) --force-mbr
+	$(LID)  --force-mbr $(OUTPUT_FILE)  
 	$(QEMU) $(OUTPUT_FILE) 

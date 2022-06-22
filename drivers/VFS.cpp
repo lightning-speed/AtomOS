@@ -120,7 +120,9 @@ namespace VFS
 		//IF FILE EXISTS IT WONT CREATE NEW IT WILL JUST GIVE THE EXISTING NODE
 		fnode *out = openTree(path, prot);
 		if (out != nullptr)
+		{
 			out->open = true;
+		}
 		return out;
 	}
 	uint32_t write(fnode *f, int data)

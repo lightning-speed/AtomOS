@@ -22,9 +22,9 @@
 void randomize_mem(uint32_t from, uint32_t till);
 void kernel_stage2();
 process_t *kernel_stage2proc;
-multiboot_module_t *kmod;
 extern "C" int kmain(uint32_t mb_sig, uint32_t mb_addr)
 {
+	randomize_mem(0x200000, 0x1900000);
 	//As Malloc is required everywhere we initalize it first
 	mm_init();
 
@@ -51,10 +51,7 @@ extern "C" int kmain(uint32_t mb_sig, uint32_t mb_addr)
 		//after checking the signature and address
 		Serial::log("Multiboot Verified\n");
 		struct multiboot_info *mbinfo = (multiboot_info *)mb_addr;
-
 		multiboot_module_t *mod = (multiboot_module_t *)mbinfo->mods_addr;
-
-		kmod = (multiboot_module_t *)mbinfo->mods_addr + 1;
 		Ramdisk::start = (char *)mod->mod_start;
 		FB::init((char *)(mbinfo->framebuffer_addr), mbinfo->framebuffer_width, mbinfo->framebuffer_height, mbinfo->framebuffer_pitch);
 	}
@@ -74,11 +71,12 @@ void kernel_stage2()
 	VFS::init();
 	//Initfs will be mounted in the ramdisk init
 	Ramdisk::init();
-	fnode *kf = VFS::open("kernel.elf", "w");
-	VFS::setBuffer(kf, (char *)kmod->mod_start, (uint32_t)kmod->mod_end - (uint32_t)kmod->mod_start);
-	VFS::close(kf);
 	CGA::print("Filesystem Mounted [Done]\n", 0x09);
+	fnode *fontFile = VFS::open("unifont.bin", "r");
+	FB::loadFont(fontFile);
+	VFS::close(fontFile);
 	CGA::clearScreen();
+	free((char *)10000000);
 	Runtime::exec("cmd.exe", 0, nullptr, nullptr);
 	Scheduler::killProcess(kernel_stage2proc);
 	while (1)

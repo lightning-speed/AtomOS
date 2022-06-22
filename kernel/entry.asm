@@ -1,5 +1,5 @@
 %define MULTIBOOT_HEADER_MAGIC 0x1badb002
-%define MULTIBOOT_HEADER_FLAGS 0
+%define MULTIBOOT_HEADER_FLAGS (1 << 2)
 
 extern multiboot_main
 global _start
