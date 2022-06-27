@@ -16,4 +16,6 @@ namespace Sys
 	void time(register_t *regs);
 	void env(register_t *regs);
 	void rem(register_t *regs);
+	void wm(register_t *regs);
+	void wg(register_t *regs);
 };

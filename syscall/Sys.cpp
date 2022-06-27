@@ -197,5 +197,12 @@ namespace Sys
 		else
 			regs->ecx = 0;
 	}
+	void wm(register_t *regs)
+	{
+		
+	}
+	void wg(register_t *regs)
+	{
+	}
 
 };
