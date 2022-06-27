@@ -2,33 +2,36 @@
 #include <IO.h>
 #include <FB.h>
 #include <Memory.h>
+#include "../Glib/WindowManager.h"
+#include <Scheduler.h>
 int CGA::sx = 0;
 int CGA::sy = 0;
 char CGA::screenColor = 0x0f;
 bool lockedC = 0;
+Window win;
 int colors[] = {
-		((0 << 24) | (0 << 16) | (0 << 8) | 255),
-		((0 << 24) | (0 << 16) | (255 << 8) | 255),
-		((0 << 24) | (0 << 16) | (0 << 8) | 255),
-		((0 << 24) | (0 << 16) | (0 << 8) | 255),
-		((0 << 24) | (0 << 16) | (0 << 8) | 255),
-		((0 << 24) | (0 << 16) | (0 << 8) | 255),
-		((0 << 24) | (0 << 16) | (0 << 8) | 255),
-		((0 << 24) | (0 << 16) | (0 << 8) | 255),
-		((0 << 24) | (0 << 16) | (0 << 8) | 255),
-		((255 << 24) | (60 << 16) | (0 << 8) | 255),
-		((0 << 24) | (0 << 16) | (0 << 8) | 255),
-		((0 << 24) | (0 << 16) | (0 << 8) | 255),
-		((0 << 24) | (255 << 16) | (100 << 8) | 100),
-		((255 << 24) | (250 << 16) | (40 << 8) | 170),
-		((255 << 24) | (255 << 16) | (255 << 8) | 0),
-		((255 << 24) | (255 << 16) | (255 << 8) | 255)};
+	((0 << 24) | (0 << 16) | (0 << 8) | 255),
+	((0 << 24) | (0 << 16) | (255 << 8) | 255),
+	((0 << 24) | (0 << 16) | (0 << 8) | 255),
+	((0 << 24) | (0 << 16) | (0 << 8) | 255),
+	((0 << 24) | (0 << 16) | (0 << 8) | 255),
+	((0 << 24) | (0 << 16) | (0 << 8) | 255),
+	((0 << 24) | (0 << 16) | (0 << 8) | 255),
+	((0 << 24) | (0 << 16) | (0 << 8) | 255),
+	((0 << 24) | (0 << 16) | (0 << 8) | 255),
+	((255 << 24) | (60 << 16) | (0 << 8) | 255),
+	((0 << 24) | (0 << 16) | (0 << 8) | 255),
+	((0 << 24) | (0 << 16) | (0 << 8) | 255),
+	((0 << 24) | (255 << 16) | (100 << 8) | 100),
+	((255 << 24) | (250 << 16) | (40 << 8) | 170),
+	((255 << 24) | (255 << 16) | (255 << 8) | 0),
+	((255 << 24) | (255 << 16) | (255 << 8) | 255)};
 namespace CGA
 {
 	void printChar(char c, int x, int y)
 	{
 
-		FB::drawTerminalAsciiChar(x, y, c, colors[CGA::screenColor]);
+		WindowManager::drawTerminalAsciiChar(win, x, y, c, colors[CGA::screenColor]);
 		if (x < 80)
 			CGA::setCursorPosition(x + 1, y);
 		else
@@ -108,12 +111,6 @@ namespace CGA
 	}
 	void setCursorPosition(int xe, int ye)
 	{
-		unsigned temp;
-		temp = ye * 80 + xe;
-		IO::outb(0x3D4, 14);
-		IO::outb(0x3D5, temp >> 8);
-		IO::outb(0x3D4, 15);
-		IO::outb(0x3D5, temp);
 	}
 	void backSpace()
 	{
@@ -131,5 +128,18 @@ namespace CGA
 			CGA::setCursorPosition(sx, sy);
 		else
 			CGA::setCursorPosition(0, sy);
+	}
+	void swap()
+	{
+		for (;;)
+		{
+			asm volatile("int $32");
+			WindowManager::repaint(win);
+		}
+	}
+	void init()
+	{
+		win = WindowManager::create("conhost", 0, 0, 0);
+		Scheduler::create(nullptr, (void *)swap);
 	}
 };

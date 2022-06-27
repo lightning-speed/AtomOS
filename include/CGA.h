@@ -11,4 +11,5 @@ namespace CGA
 	void printChar(char c);
 	void setCursorPosition(int xe, int ye);
 	void backSpace();
+	void init();
 };

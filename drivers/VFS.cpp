@@ -93,7 +93,7 @@ namespace VFS
 			fnode *n = nullptr;
 			if (file == nullptr)
 			{
-				if (!(!strcmp(prot, "w") || !strcmp(prot, "a")))
+				if (prot[0] == 'r')
 					return nullptr;
 				n = createFile(name);
 				n->size = 0;
@@ -117,7 +117,6 @@ namespace VFS
 		{
 			return vfs_node;
 		}
-		//IF FILE EXISTS IT WONT CREATE NEW IT WILL JUST GIVE THE EXISTING NODE
 		fnode *out = openTree(path, prot);
 		if (out != nullptr)
 		{

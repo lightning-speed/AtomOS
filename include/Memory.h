@@ -2,7 +2,7 @@
 
 #pragma once
 
-#define max_pages 10000
+#define max_pages 30000
 #define mm_page_size 512
 
 extern uint32_t m_start;

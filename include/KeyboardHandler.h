@@ -9,4 +9,5 @@ public:
 	int index;
 	int fetch();
 	KeyboardHandler();
+	void del();
 };

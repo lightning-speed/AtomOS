@@ -6,6 +6,7 @@ int FB::width;
 int FB::pitch;
 char *FB::addr;
 char *FB::font;
+uint32_t backColor = ((255 << 24) | (46 << 16) | (02 << 8) | 79);
 namespace FB
 {
 	void init(char *addr, int width, int height, int pitch)
@@ -21,10 +22,13 @@ namespace FB
 	}
 	void setPixel(int x, int y, int color)
 	{
-		unsigned where = x * 4 + y * pitch;
-		addr[where] = color & 255;						 // BLUE
-		addr[where + 1] = (color >> 8) & 255;	 // GREEN
-		addr[where + 2] = (color >> 16) & 255; // RED
+		uint32_t where = (x * 4 + y * pitch) / 4;
+		((uint32_t *)addr)[where] = color;
+	}
+	void setPixel(char *buff, int x, int y, int color)
+	{
+		uint32_t where = (x * 4 + y * pitch) / 4;
+		((uint32_t *)addr)[where] = color;
 	}
 	void drawChar(uint64_t x, uint64_t y, char c, int color)
 	{
@@ -37,7 +41,7 @@ namespace FB
 					setPixel(x + j, i + y, color);
 				}
 				else
-					setPixel(x + j, i + y, 1);
+					setPixel(x + j, i + y, backColor);
 			}
 		}
 	}
@@ -51,10 +55,23 @@ namespace FB
 	}
 	void scroll()
 	{
-		memcpy(addr, addr + (width * 4 + 18 * pitch), (width * 4 + 18 * pitch) * 24);
+		memcpy(addr, addr + (width * 18) * 4, (width * 14) * 25 * 4);
 	}
 	void clearScreen()
 	{
-		memset(addr, 0, width * 4 + height * pitch);
+		for (int i = 0; i < height; i++)
+		{
+			int r = i * FB::width;
+			for (int j = 0; j < width; j++)
+				((uint32_t *)addr)[r + j] = backColor;
+		}
+	}
+	void repaint(char *buff)
+	{
+		memcpy(addr, buff, (width * 4 + height * pitch));
+	}
+	void repaint(char *buff, int x, int y, int tox, int toy)
+	{
+		memcpy(addr + ((x * 4 + y * pitch)), buff + ((x * 4 + y * pitch)), ((tox * 4 + toy * pitch)));
 	}
 }

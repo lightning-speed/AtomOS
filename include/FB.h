@@ -7,12 +7,15 @@ namespace FB
 	extern int width, height, pitch;
 	extern char *addr;
 	extern char *font;
-
+	extern char *buff;
 	void init(char *addr, int width, int height, int pitch);
 	void setPixel(int x, int y, int color);
+	void setPixel(char *buff, int x, int y, int color);
 	void drawChar(uint64_t x, uint64_t y, char c, int color);
 	void loadFont(fnode *f);
 	void drawTerminalAsciiChar(int x, int y, char c, int color);
 	void scroll();
 	void clearScreen();
+	void repaint(char *buff);
+	void repaint(char *buff, int x, int y, int tox, int toy);
 }
