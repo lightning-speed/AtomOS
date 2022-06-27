@@ -1,7 +1,7 @@
 # AtomOS
 A x86 Multitasking lightweight os written in C++ 
 
-![image](https://user-images.githubusercontent.com/82322282/175992048-90ce0b9a-958f-4005-ab66-4244490a2ade.png)
+![image](https://user-images.githubusercontent.com/82322282/175992874-dc6d684a-d627-4a29-9ae4-5bbed286b5eb.png)
 
 ## Running Gnome Lang
 
