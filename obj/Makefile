@@ -1,11 +1,13 @@
 CC = i686-elf-g++
-CFLAGS = -c -m32 -std=c++11 -I ../include -w -fno-exceptions
+CFLAGS = -c -m32 -std=c++11 -I ../include -w -fno-exceptions -O2
 ASM = nasm
 AFLAGS  = -felf32
 CSRC = $(wildcard ../kernel/*.cpp)
 DSRC = $(wildcard ../lib/*.cpp)
 LSRC = $(wildcard ../drivers/*.cpp)
 SSRC = $(wildcard ../syscall/*.cpp)
+GSRC = $(wildcard ../Glib/*.cpp)
+
 
 LD = i686-elf-ld
 LFLAGS = -T ../linker.ld
@@ -17,6 +19,8 @@ all:
 	$(MAKE) Dbuild
 	$(MAKE) Lbuild
 	$(MAKE) Sbuild
+	$(MAKE) Gbuild
+
 	$(MAKE) Link
 	$(MAKE) clean
 
@@ -31,6 +35,10 @@ Dbuild: $(DSRC)
 
 Sbuild: $(SSRC)
 	$(CC) $(CFLAGS) $^ 	
+
+Gbuild: $(GSRC)
+	$(CC) $(CFLAGS) $^ 	
+
 
 Abuild: 
 	$(ASM) $(AFLAGS) ../kernel/entry.asm -o entry.po

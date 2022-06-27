@@ -9,6 +9,6 @@ call acc sys/brainf.c sys/bf.exe 0x900000
 
 
 cd sys
-..\tools\mkfs test.c cmd.exe bf.exe code.bf gnome.exe unifont.bin car.gnm bin/cat.exe  ramdisk
+..\tools\mkfs test.c cmd.exe bf.exe code.bf gnome.exe unifont.bin car.gnm a.rgba bin/cat.exe  ramdisk
 copy ramdisk ..\disk\ramdisk
 pause
