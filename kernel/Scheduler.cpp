@@ -1,6 +1,7 @@
 #include <Scheduler.h>
 #include <CGA.h>
 #include <Memory.h>
+#include <utilfunc.h>
 #include <PIT.h>
 #include <Serial.h>
 thread_t *Scheduler::threads[512];
@@ -12,6 +13,8 @@ uint64_t Scheduler::timePassedSinceReschedule = 0;
 uint16_t Scheduler::processCount = 0;
 process_t *Scheduler::processes[512];
 int Scheduler::CPUUsage;
+thread_t *idle_thread;
+
 namespace Scheduler
 {
 	void idle()
@@ -24,7 +27,9 @@ namespace Scheduler
 
 		enabled = true;
 		PIT::init();
-		create(nullptr, (void *)idle);
+		idle_thread = create(nullptr, (void *)idle);
+		threads[threadCount - 1] = nullptr;
+		threadCount--;
 		if (Serial::verboseOn)
 			Serial::log("Scheduler setup [Done]\n");
 	}
@@ -111,6 +116,11 @@ namespace Scheduler
 				removeThreadAt(i);
 			}
 		}
+		if (temp_index == 0)
+		{
+			runningThreads[0] = idle_thread;
+			temp_index++;
+		}
 		runningThreads[temp_index] = (thread_t *)nullptr;
 		currentThreadIndex = 0;
 		timePassedSinceReschedule = 0;
@@ -181,7 +191,7 @@ namespace Scheduler
 		asm volatile("cli");
 		if (proc == nullptr)
 			return;
-		free((char *)proc->keyboardHandler.buffer);
+		proc->keyboardHandler.del();
 		for (int i = 0; i < proc->childrenCount; i++)
 		{
 			proc->children[i]->state = KILL_REQUESTED;
@@ -220,8 +230,5 @@ namespace Scheduler
 	{
 		t->state = RUNNING;
 	}
-	void attachKeyboardHandler(process_t *proc, KeyboardHandler handler)
-	{
-		proc->keyboardHandler = handler;
-	}
+
 };

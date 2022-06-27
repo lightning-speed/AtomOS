@@ -1,6 +1,8 @@
 #include <KeyboardHandler.h>
 #include <Memory.h>
 #include <CGA.h>
+#include <Serial.h>
+
 KeyboardHandler::KeyboardHandler()
 {
 	buffer = (int *)malloc(500);
@@ -19,4 +21,9 @@ int KeyboardHandler::fetch()
 		return out;
 	}
 	return 0;
+}
+void KeyboardHandler::del()
+{
+	free((char *)buffer);
+	Serial::log("kh destroyed");
 }
