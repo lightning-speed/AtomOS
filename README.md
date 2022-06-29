@@ -32,7 +32,7 @@ A x86 Multitasking lightweight os written in C++
 - [x] PC speaker
 - [x] PS/2 Keyboard
 - [x] COM 
-- [x] ps/2 Mouse
+- [x] PS/2 Mouse
 
 ## Discord server
 https://discord.gg/peb2raJpzD
