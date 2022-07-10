@@ -89,7 +89,6 @@ namespace VFS
 		while (name != nullptr)
 		{
 			file = getChild(name, last);
-			//IF NOT THERE, CREATE ONE
 			fnode *n = nullptr;
 			if (file == nullptr)
 			{
@@ -121,6 +120,7 @@ namespace VFS
 		if (out != nullptr)
 		{
 			out->open = true;
+			Serial::log("file opened: " + (String)(char *)out->name + "\n");
 		}
 		return out;
 	}
@@ -159,6 +159,7 @@ namespace VFS
 		if (node != nullptr)
 		{
 			node->open = false;
+			Serial::log("file closed: " + (String)(char *)node->name + "\n");
 			return 1;
 		}
 		return 0;

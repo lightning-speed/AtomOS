@@ -20,12 +20,11 @@ namespace FB
 	{
 		font = f->content;
 	}
-	void setPixel(int x, int y, int color)
+	void setPixel(int x, int y, uint32_t color)
 	{
-		uint32_t where = (x * 4 + y * pitch) / 4;
-		((uint32_t *)addr)[where] = color;
+		((uint32_t *)addr)[(y * FB::width) + x] = color;
 	}
-	void setPixel(char *buff, int x, int y, int color)
+	void setPixel(char *buff, int x, int y, uint32_t color)
 	{
 		uint32_t where = (x * 4 + y * pitch) / 4;
 		((uint32_t *)addr)[where] = color;
@@ -70,8 +69,13 @@ namespace FB
 	{
 		memcpy(addr, buff, (width * 4 + height * pitch));
 	}
-	void repaint(char *buff, int x, int y, int tox, int toy)
+	void repaint(uint32_t *buff, int x, int y, int tox, int toy)
 	{
-		memcpy(addr + ((x * 4 + y * pitch)), buff + ((x * 4 + y * pitch)), ((tox * 4 + toy * pitch)));
+		for (int i = 0; i < height; i++)
+		{
+			int r = i * FB::width;
+			for (int j = 0; j < width; j++)
+				((uint32_t *)addr)[r + j] = ((uint32_t *)buff)[r + j];
+		}
 	}
 }

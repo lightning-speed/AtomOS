@@ -4,6 +4,18 @@
 extern uint32_t backColor;
 namespace WindowManager
 {
+    static inline void repaint(Window win)
+    {
+        uint32_t r = win->width * win->height;
+        for (uint32_t i = 0; i < r; i++)
+        {
+            ((uint32_t *)FB::addr)[i] = (win->buffer)[i];
+        }
+    }
+    Window create(String name)
+    {
+        return create(name, 300, 300, 1);
+    }
     Window create(String name, uint16_t width, uint16_t height, int mode)
     {
         Window out = (Window)malloc(sizeof(window_t));
@@ -23,9 +35,10 @@ namespace WindowManager
         for (uint64_t i = 0; i < 16; i++)
         {
             int r = ((i + y) * FB::width);
+            char f = FB::font[(c * 16) + i];
             for (uint64_t j = 0; j < 8; j++)
             {
-                if ((FB::font[(c * 16) + i] & (0x80 >> j)) != 0)
+                if ((f & (0x80 >> j)) != 0)
                 {
                     ((uint32_t *)w->buffer)[r + (x + j)] = color;
                 }
@@ -36,18 +49,27 @@ namespace WindowManager
     }
     void drawTerminalAsciiChar(Window w, int x, int y, char c, int color)
     {
+        if (w == nullptr)
+            return;
+
         if (c == 0)
             c = ' ';
         int xx = x * 9;
         int yy = y * 18;
         drawChar(w, xx, yy, c, color);
     }
-    void repaint(Window w, uint16_t sx, uint16_t sy, uint16_t width, uint16_t height)
+
+    void clear(Window w)
     {
-        FB::repaint((char *)w->buffer, sx, sy, sx + width, sy + height);
+        int r = w->width * w->height;
+        for (int i = 0; i < r; i++)
+        {
+            w->buffer[i] = backColor;
+        }
     }
-    void repaint(Window w)
+    void destroy(Window w)
     {
-        repaint(w, 0, 0, w->width, w->height);
+        free((char *)w->buffer);
+        free((char *)w);
     }
 };

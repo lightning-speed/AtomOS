@@ -49,14 +49,14 @@ namespace Keyboard
 				if ((proc->name == "cmd.exe") == 0)
 				{
 					Scheduler::killProcess(proc);
-					CGA::print("^C");
+					CGA::print("^C\n");
 				}
 			}
 
 			if (proc != nullptr)
 			{
-				proc->keyboardHandler.buffer[proc->keyboardHandler.index] = c;
-				proc->keyboardHandler.index++;
+				proc->keyboardHandler->buffer[proc->keyboardHandler->index] = c;
+				proc->keyboardHandler->index++;
 			}
 		}
 	}

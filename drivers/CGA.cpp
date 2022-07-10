@@ -4,11 +4,12 @@
 #include <Memory.h>
 #include "../Glib/WindowManager.h"
 #include <Scheduler.h>
+#include <Serial.h>
 int CGA::sx = 0;
 int CGA::sy = 0;
 char CGA::screenColor = 0x0f;
 bool lockedC = 0;
-Window win;
+Window win = nullptr;
 int colors[] = {
 	((0 << 24) | (0 << 16) | (0 << 8) | 255),
 	((0 << 24) | (0 << 16) | (255 << 8) | 255),
@@ -104,8 +105,7 @@ namespace CGA
 
 	void clearScreen()
 	{
-		FB::clearScreen();
-
+		WindowManager::clear(win);
 		sx = 0;
 		sy = 0;
 	}
@@ -129,17 +129,24 @@ namespace CGA
 		else
 			CGA::setCursorPosition(0, sy);
 	}
+
 	void swap()
 	{
-		for (;;)
+		while (1)
 		{
+			Scheduler::getCurrentThread()->sleepTimeLeft = 30;
+			Scheduler::getCurrentThread()->state = SLEEPING;
 			asm volatile("int $32");
-			WindowManager::repaint(win);
+			uint32_t r = win->width * win->height;
+			for (uint32_t i = 0; i < r; i++)
+			{
+				((uint32_t *)FB::addr)[i] = (win->buffer)[i];
+			}
 		}
 	}
 	void init()
 	{
-		win = WindowManager::create("conhost", 0, 0, 0);
-		Scheduler::create(nullptr, (void *)swap);
+		win = WindowManager::create("conhost", 640, 480, 0);
+		//Scheduler::create(nullptr, (void *)swap);
 	}
 };

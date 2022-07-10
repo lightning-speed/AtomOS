@@ -11,9 +11,6 @@ uint32_t Ramdisk::size;
 void Ramdisk::init()
 {
 
-	Ramdisk::size = 0;
-	for (int i = 0; Ramdisk::start[i] != '$' && Ramdisk::start[i + 1] != '$' && Ramdisk::start[i + 2] != '%' && Ramdisk::start[i + 3] != '@'; i++, Ramdisk::size++)
-		;
 	char *disk = Ramdisk::start;
 	fnode *tree = (fnode *)malloc(sizeof(fnode));
 	tree->size = 0;
