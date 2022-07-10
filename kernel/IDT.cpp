@@ -2,46 +2,45 @@
 #include <IO.h>
 #include <CGA.h>
 #include <Scheduler.h>
+#include <Serial.h>
 #include <Runtime.h>
 
 void *interrupt_handlers[256];
 
 static char *exception_messages[32] = {
-		"Division by zero",
-		"Debug",
-		"Non-maskable interrupt",
-		"Breakpoint",
-		"Detected overflow",
-		"Out-of-bounds",
-		"Invalid opcode",
-		"No coprocessor",
-		"Double fault",
-		"Coprocessor segment overrun",
-		"Bad TSS",
-		"Segment not present",
-		"Stack fault",
-		"General protection fault",
-		"Page fault",
-		"Unknown interrupt",
-		"Coprocessor fault",
-		"Alignment check",
-		"Machine check",
-		"Reserved",
-		"Reserved",
-		"Reserved",
-		"Reserved",
-		"Reserved",
-		"Reserved",
-		"Reserved",
-		"Reserved",
-		"Reserved",
-		"Reserved",
-		"Reserved",
-		"Reserved",
-		"Reserved",
+	"Division by zero",
+	"Debug",
+	"Non-maskable interrupt",
+	"Breakpoint",
+	"Detected overflow",
+	"Out-of-bounds",
+	"Invalid opcode",
+	"No coprocessor",
+	"Double fault",
+	"Coprocessor segment overrun",
+	"Bad TSS",
+	"Segment not present",
+	"Stack fault",
+	"General protection fault",
+	"Page fault",
+	"Unknown interrupt",
+	"Coprocessor fault",
+	"Alignment check",
+	"Machine check",
+	"Reserved",
+	"Reserved",
+	"Reserved",
+	"Reserved",
+	"Reserved",
+	"Reserved",
+	"Reserved",
+	"Reserved",
+	"Reserved",
+	"Reserved",
+	"Reserved",
+	"Reserved",
+	"Reserved",
 };
-
-
 
 struct idt_entry idt[256];
 struct idt_ptr idtp;
@@ -100,7 +99,10 @@ extern "C" void exception_handler(register_t *regs)
 	}
 	CGA::print("\n\nException: ", 0x0c);
 	CGA::print((String)exception_messages[regs->int_no]);
-	CGA::print((String)(int)regs->eflags);
+	CGA::print((String)(int)regs->eip);
+	Serial::log("\n\nException: ");
+	Serial::log((String)exception_messages[regs->int_no]);
+	Serial::log((String)(int)regs->eip);
 	if (regs->int_no == 13)
 	{
 		for (;;)

@@ -13,7 +13,8 @@ header_start:
     dd -(MULTIBOOT_HEADER_MAGIC + MULTIBOOT_HEADER_FLAGS)
 header_end:
 
-
+global stack_end
+global stack_begin
 
 extern kmain
 global _start

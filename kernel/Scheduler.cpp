@@ -12,6 +12,7 @@ uint16_t Scheduler::currentThreadIndex = 0;
 uint64_t Scheduler::timePassedSinceReschedule = 0;
 uint16_t Scheduler::processCount = 0;
 process_t *Scheduler::processes[512];
+uint16_t Scheduler::runningThreadCount = 0;
 int Scheduler::CPUUsage;
 thread_t *idle_thread;
 
@@ -28,8 +29,10 @@ namespace Scheduler
 		enabled = true;
 		PIT::init();
 		idle_thread = create(nullptr, (void *)idle);
+		//Removes the idle thread As we will only need it when there is not thread to run
 		threads[threadCount - 1] = nullptr;
 		threadCount--;
+
 		if (Serial::verboseOn)
 			Serial::log("Scheduler setup [Done]\n");
 	}
@@ -78,7 +81,7 @@ namespace Scheduler
 
 		//Reschedule if end or the array is reached
 
-		if (runningThreads[currentThreadIndex] == (thread_t *)nullptr)
+		if (currentThreadIndex == runningThreadCount)
 		{
 			reSchedule();
 		}
@@ -92,13 +95,14 @@ namespace Scheduler
 	}
 	void reSchedule()
 	{
-		uint16_t temp_index = 0;
+		runningThreadCount = 0;
 		for (uint16_t i = 0; i < threadCount; i++)
 		{
+
 			if (threads[i]->state == RUNNING)
 			{
-				runningThreads[temp_index] = threads[i];
-				temp_index++;
+				runningThreads[runningThreadCount] = threads[i];
+				runningThreadCount++;
 			}
 			else if (threads[i]->state == SLEEPING)
 			{
@@ -116,12 +120,12 @@ namespace Scheduler
 				removeThreadAt(i);
 			}
 		}
-		if (temp_index == 0)
+		if (runningThreadCount == 0)
 		{
 			runningThreads[0] = idle_thread;
-			temp_index++;
+			runningThreadCount++;
 		}
-		runningThreads[temp_index] = (thread_t *)nullptr;
+		runningThreads[runningThreadCount] = (thread_t *)nullptr;
 		currentThreadIndex = 0;
 		timePassedSinceReschedule = 0;
 	}
@@ -180,7 +184,7 @@ namespace Scheduler
 			return nullptr;
 		process_t *out = createProcess(name);
 		out->data = data;
-		out->keyboardHandler = KeyboardHandler();
+		out->keyboardHandler = KeyboardManager::create();
 		addThreadToProcess(create(data, func), out);
 		Serial::log("Created Porcess [" + name + "]\n");
 		return out;
@@ -191,7 +195,7 @@ namespace Scheduler
 		asm volatile("cli");
 		if (proc == nullptr)
 			return;
-		proc->keyboardHandler.del();
+		KeyboardManager::del(proc->keyboardHandler);
 		for (int i = 0; i < proc->childrenCount; i++)
 		{
 			proc->children[i]->state = KILL_REQUESTED;

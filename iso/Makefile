@@ -13,4 +13,4 @@ all:
 	-rm -f $(OUTPUT_FILE)
 	$(FM) $(FM_FLAGS) -o $(OUTPUT_FILE) ./ $(LIMINE_PATH)
 	$(LID)  $(OUTPUT_FILE)  
-	$(QEMU) $(OUTPUT_FILE) 
+	$(QEMU) $(OUTPUT_FILE) --serial file:../serial.log

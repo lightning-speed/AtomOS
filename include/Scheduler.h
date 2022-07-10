@@ -3,7 +3,8 @@
 #include <IDT.h>
 #include <String.h>
 #include <KeyboardHandler.h>
-#define THREAD_STACK_SIZE 0x3000
+
+#define THREAD_STACK_SIZE 0x10000
 #define MAX_THREADS 512
 #define MAX_PROCESSES 512
 enum state_t
@@ -43,6 +44,7 @@ typedef struct
 	uint8_t childrenCount;
 	pdata_t *data;
 	KeyboardHandler keyboardHandler;
+
 } process_t;
 
 namespace Scheduler
@@ -54,6 +56,7 @@ namespace Scheduler
 	extern uint64_t timePassedSinceReschedule;
 	extern uint16_t processCount;
 	extern uint16_t threadCount;
+	extern uint16_t runningThreadCount;
 	extern int CPUUsage;
 
 	void start();

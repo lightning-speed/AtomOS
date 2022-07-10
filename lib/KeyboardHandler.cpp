@@ -2,28 +2,33 @@
 #include <Memory.h>
 #include <CGA.h>
 #include <Serial.h>
-
-KeyboardHandler::KeyboardHandler()
+namespace KeyboardManager
 {
-	buffer = (int *)malloc(500);
-	index = 1;
-}
-int KeyboardHandler::fetch()
-{
-	if (index > 1)
+	KeyboardHandler create()
 	{
-		index--;
-		int out = buffer[index];
-		for (int i = 0; i < index + 1; i++)
-		{
-			buffer[i] = buffer[i + 1];
-		}
-		return out;
+		KeyboardHandler handler = (KeyboardHandler)malloc(sizeof(KeyboardHandler_t));
+		handler->buffer = (uint16_t *)malloc(500);
+		handler->index = 1;
+		return handler;
 	}
-	return 0;
-}
-void KeyboardHandler::del()
-{
-	free((char *)buffer);
-	Serial::log("kh destroyed");
-}
+	int fetch(KeyboardHandler handler)
+	{
+		if (handler->index > 1)
+		{
+			handler->index--;
+			int out = handler->buffer[handler->index];
+			for (int i = 0; i < handler->index + 1; i++)
+			{
+				handler->buffer[i] = handler->buffer[i + 1];
+			}
+			return out;
+		}
+		return 0;
+	}
+	void del(KeyboardHandler handler)
+	{
+		free((char *)handler->buffer);
+		free((char *)handler);
+		Serial::log("kh destroyed");
+	}
+};

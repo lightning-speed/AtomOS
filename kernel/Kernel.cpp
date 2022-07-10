@@ -33,20 +33,16 @@ extern "C" int kmain(uint32_t mb_sig, uint32_t mb_addr)
 	gdt_install();
 	idt_install();
 	PIC::init();
-	CGA::print("PIC [Done]\n", 0x0e);
 	Serial::setup();
-	CGA::print("Serial [Done]\n", 0x0d);
 	Serial::verboseOn = true;
 	//first thread is continued to where eip
 	thread_t *kernel_stage1 = Scheduler::create(nullptr, nullptr);
 	Scheduler::start();
-	CGA::print("Scheduler [Done]\n", 0x0c);
 	Keyboard::init();
-	CGA::print("Keyboard [Done]\n", 0x0b);
 	Syscall::init();
-	CGA::print("Syscalls [Done]\n", 0x0a);
 	Mouse::init();
 	install_interrupt_gates();
+
 	if (mb_sig == 0x2BADB002 && mb_addr < 0x100000)
 
 	{
@@ -55,6 +51,7 @@ extern "C" int kmain(uint32_t mb_sig, uint32_t mb_addr)
 		struct multiboot_info *mbinfo = (multiboot_info *)mb_addr;
 		multiboot_module_t *mod = (multiboot_module_t *)mbinfo->mods_addr;
 		Ramdisk::start = (char *)mod->mod_start;
+		Ramdisk::size = mod->mod_start - (uint32_t)Ramdisk::start;
 		FB::init((char *)(mbinfo->framebuffer_addr), mbinfo->framebuffer_width, mbinfo->framebuffer_height, mbinfo->framebuffer_pitch);
 		CGA::init();
 	}
@@ -79,23 +76,26 @@ void kernel_stage2()
 	FB::loadFont(fontFile);
 	VFS::close(fontFile);
 	CGA::clearScreen();
-	int index;
-	/*for (int i = 1; i < 255; i += 1)
+	/*fnode *icon = VFS::open("icon", "r");
+	uint8_t *c = (uint8_t *)icon->content;
+	for (int i = 0; i < 100; i++)
 	{
-		index = 0;
-		for (int j = 0; j < 400; j++)
+		for (int j = 0; j < 100; j++)
 		{
-			for (int r = 0; r < 400; r++)
-			{
-				((uint32_t *)w.buffer)[(j * FB::width) + r] = 0xffffffff / i;
-			}
+			uint32_t p;
+			char *rp = (char *)&p;
+			rp[0] = c[3];
+			rp[1] = c[1];
+			rp[2] = c[2];
+			rp[3] = c[0];
+			FB::setPixel(i, j, p);
+			c += 4;
 		}
-		w.repaint(0, 0, 400, 400);
 	}
 	for (;;)
 	{
 	}*/
-	Runtime::exec("cmd.exe", 0, nullptr, nullptr);
+	Runtime::exec("bin/cmd.exe", 0, nullptr, nullptr);
 	for (;;)
 	{
 		int ans = 0;

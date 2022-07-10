@@ -1,13 +1,17 @@
 #pragma once
 #include <stdint.h>
 
-class KeyboardHandler
+typedef struct
 {
-private:
-public:
-	int *buffer;
+	uint16_t *buffer;
 	int index;
-	int fetch();
-	KeyboardHandler();
-	void del();
+} KeyboardHandler_t;
+
+typedef KeyboardHandler_t *KeyboardHandler;
+
+namespace KeyboardManager
+{
+	KeyboardHandler create();
+	int fetch(KeyboardHandler handler);
+	void del(KeyboardHandler handler);
 };

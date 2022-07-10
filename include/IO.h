@@ -6,4 +6,5 @@ namespace IO
 	void outb(uint16_t _port, uint8_t _data);
 	void outw(uint16_t _port, uint16_t _data);
 	uint16_t inw(uint16_t _port);
+	void io_wait();
 };

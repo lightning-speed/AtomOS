@@ -151,9 +151,7 @@ bool operator==(String s, String s2)
 }
 String::~String()
 {
-	len = 0;
 	free(buffer);
-	buffer = nullptr;
 }
 String operator+(String s, String s2)
 {

@@ -17,14 +17,14 @@ void mm_init()
 		Serial::log("Memory setup [Done]\n");
 }
 
-extern "C" void memcpy(char *to, char *from, uint32_t size_to_move)
+void memcpy(char *to, char *from, uint32_t size_to_move)
 {
 	for (uint32_t i = 0; i < size_to_move; i++)
 	{
 		to[i] = from[i];
 	}
 }
-extern "C" void memset(char *p, char c, uint32_t size)
+void memset(char *p, char c, uint32_t size)
 {
 	for (uint32_t i = 0; i < size; i++)
 	{
