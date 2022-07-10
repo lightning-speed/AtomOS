@@ -7,7 +7,7 @@
 #define DT_REG 2
 
 void set_screen(uint32_t type, uint32_t val);
-uint32_t syscall(uint32_t eax, uint32_t ebx, uint32_t ecx, uint32_t edx);
+extern uint32_t syscall(uint32_t eax, uint32_t ebx, uint32_t ecx, uint32_t edx);
 
 DIR *opendir(const char *path);
 dirent *readdir(DIR *dir);
@@ -47,3 +47,19 @@ char *getenv(const char *of)
 		return ((char **)syscall(10, 0, 0, 0))[2];
 	}
 }
+typedef struct
+{
+	uint16_t width;
+	uint16_t height;
+	uint16_t x;
+	uint16_t y;
+	char *name;
+	uint32_t *buffer;
+} window_t;
+
+typedef window_t *Window;
+
+void swap_buffer(Window win);
+void fillRect(Window w, int x, int y, int width, int height);
+void setColor(uint32_t color);
+void swap_buffer_pos(Window win, uint32_t x, uint32_t y, uint32_t w, uint32_t h);

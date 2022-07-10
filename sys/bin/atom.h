@@ -1,9 +1,17 @@
 #pragma once
 #include <stdint.h>
 #include <string.h>
-void set_screen(uint32_t type, uint32_t val);
-uint32_t syscall(uint32_t eax, uint32_t ebx, uint32_t ecx, uint32_t edx);
+#include <stdio.h>
+#define ESC 27
+#define DT_DIR 1
+#define DT_REG 2
 
+void set_screen(uint32_t type, uint32_t val);
+extern uint32_t syscall(uint32_t eax, uint32_t ebx, uint32_t ecx, uint32_t edx);
+
+DIR *opendir(const char *path);
+dirent *readdir(DIR *dir);
+int close(DIR *dir);
 int get_seconds();
 int get_minutes();
 int get_hours();
@@ -24,52 +32,6 @@ fnode *getChild(char *name, fnode *parent)
 	return (void *)0;
 }
 
-void cd(char *str);
-void ls();
-fnode *current_node;
-fnode *root_node;
-void cd(char *in)
-{
-	char str[50];
-	memcpy(str, in, 50);
-	if (current_node == (void *)0)
-	{
-		current_node = (fnode *)fopen(".", "r");
-		root_node = current_node;
-		current_node->open = 0;
-	}
-	char *temp = strtok(str, "/");
-	while (temp != (char *)0)
-	{
-		if (!strcmp(temp, ".."))
-		{
-			if ((fnode *)current_node->parent != (void *)0)
-				current_node = (fnode *)current_node->parent;
-		}
-		else
-		{
-			fnode *node = getChild(temp, current_node);
-			if (node != (void *)0 && node->type == dir)
-				current_node = node;
-			else
-				printf("no such file");
-		}
-		temp = strtok((char *)0, "/");
-	}
-}
-void ls()
-{
-	if (current_node == (void *)0)
-	{
-		current_node = (fnode *)fopen(".", "r");
-		root_node = current_node;
-		current_node->open = 0;
-	}
-	for (uint32_t i = 0; i < current_node->size; i++)
-	{
-		printf("%s%c\n", ((fnode *)current_node->children[i])->name, (((fnode *)current_node->children[i])->type == dir) * '/');
-	}
-}
 char *getenv(const char *of)
 {
 	if (!strcmp(of, "PWD"))
@@ -85,9 +47,20 @@ char *getenv(const char *of)
 		return ((char **)syscall(10, 0, 0, 0))[2];
 	}
 }
-void ls_path(char *path)
+typedef struct
 {
-	cd(path);
-	ls();
-	current_node = root_node;
-}
+	uint16_t width;
+	uint16_t height;
+	uint16_t x;
+	uint16_t y;
+	char *name;
+	uint32_t *buffer;
+} window_t;
+
+typedef window_t *Window;
+
+void swap_buffer(Window win);
+void fillRect(Window w, int x, int y, int width, int height);
+void setColor(uint32_t color);
+void swap_buffer_pos(Window win, uint32_t x, uint32_t y, uint32_t w, uint32_t h);
+int CreatePorcess(char **args, int argc, void *osteam, void *instream);

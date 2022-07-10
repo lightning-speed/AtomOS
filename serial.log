@@ -1,2 +1,45 @@
 Scheduler setup [Done]
+Multiboot Verified
 Created Porcess [kernel_stage2]
+New FS node mountedfile opened: bf.exe
+file closed: bf.exe
+file opened: code.bf
+file closed: code.bf
+file opened: gnome.exe
+file closed: gnome.exe
+file opened: unifont.bin
+file closed: unifont.bin
+file opened: car.gnm
+file closed: car.gnm
+file opened: cmd.exe
+file closed: cmd.exe
+file opened: cat.exe
+file closed: cat.exe
+file opened: unifont.bin
+file closed: unifont.bin
+file opened: cmd.exe
+file closed: cmd.exe
+Created Porcess [cmd.exe]
+29429file opened: cmd.exe
+file closed: cmd.exe
+Created Porcess [cmd.exe]
+file opened: cmd.exe
+file closed: cmd.exe
+Created Porcess [cmd.exe]
+29427file opened: cmd.exe
+file closed: cmd.exe
+Created Porcess [cmd.exe]
+file opened: cmd.exe
+file closed: cmd.exe
+Created Porcess [cmd.exe]
+29141file opened: cmd.exe
+file closed: cmd.exe
+Created Porcess [cmd.exe]
+file opened: cmd.exe
+file closed: cmd.exe
+Created Porcess [cmd.exe]
+28855kh destroyedKilled Porcess [cmd.exe]
+28569kh destroyedKilled Porcess [cmd.exe]
+kh destroyedKilled Porcess [cmd.exe]
+28581kh destroyedKilled Porcess [cmd.exe]
+28605kh destroyedKilled Porcess [cmd.exe]

@@ -7,6 +7,8 @@
 #include <Memory.h>
 #include <CMOS.h>
 #include <VFS.h>
+#include "../Glib/WindowManager.h"
+#include <FB.h>
 
 namespace Sys
 {
@@ -60,7 +62,7 @@ namespace Sys
 		switch (stream)
 		{
 		case 1:
-			regs->ecx = ((process_t *)Scheduler::getCurrentThread()->parent)->keyboardHandler.fetch();
+			regs->ecx = KeyboardManager::fetch(((process_t *)Scheduler::getCurrentThread()->parent)->keyboardHandler);
 			if (regs->ecx != 0 && regs->ecx != '\b')
 				CGA::printChar(regs->ecx);
 			break;
@@ -89,7 +91,6 @@ namespace Sys
 	void exec(register_t *regs)
 	{
 		char **args = (char **)regs->ecx;
-		uint32_t p = regs->ecx;
 		process_t *proc = Runtime::exec(args[0], regs->ebx, (char **)args, (char **)regs->edx);
 		if (proc != nullptr)
 		{
@@ -199,7 +200,28 @@ namespace Sys
 	}
 	void wm(register_t *regs)
 	{
-		
+		switch (regs->ebx)
+		{
+		case 0:
+			regs->ecx = (uint32_t)WindowManager::create((String)(char *)regs->ecx, regs->ebx >> 8, regs->ebx & 65535, 1);
+			break;
+		case 1:
+			regs->ecx = (uint32_t)FB::addr;
+			break;
+		case 2:
+			regs->ecx = (uint32_t)FB::width;
+			break;
+
+		case 3:
+			regs->ecx = (uint32_t)FB::height;
+			break;
+		case 4:
+			WindowManager::destroy((Window)regs->ecx);
+			break;
+
+		default:
+			break;
+		}
 	}
 	void wg(register_t *regs)
 	{

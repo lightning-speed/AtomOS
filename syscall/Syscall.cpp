@@ -31,6 +31,7 @@ namespace Syscall
 		else
 		{
 			CGA::print("Wrong syscall called");
+			Serial::log("Wrong syscall called: " + ((String)(int)regs->eax) + " eip: " + (String)(int)regs->eip + "\n");
 		}
 	}
 	void addSyscall(uint16_t call_number, void *function)
