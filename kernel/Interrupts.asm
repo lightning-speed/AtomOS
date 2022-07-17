@@ -38,12 +38,14 @@ global ex1
 %endmacro 
 
 interrupt_gate:
+ cli
  pushall
  push esp
  call interrupt_handler
  pop esp
  popall
  add esp,4
+ sti
  iret
 
 

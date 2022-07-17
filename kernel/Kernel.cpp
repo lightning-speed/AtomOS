@@ -28,6 +28,7 @@ process_t *kernel_stage2proc;
 extern "C" int kmain(uint32_t mb_sig, uint32_t mb_addr)
 {
 	//As Malloc is required everywhere we initalize it first
+	Runtime::clearThrash();
 	mm_init();
 
 	gdt_install();
@@ -95,21 +96,15 @@ void kernel_stage2()
 	for (;;)
 	{
 	}*/
+
 	Runtime::exec("bin/cmd.exe", 0, nullptr, nullptr);
-	for (;;)
-	{
-		int ans = 0;
-		for (int i = 0; i < max_pages; i++)
-		{
-			ans += is_page_free(i);
-		}
-		for (int i = 0; i < 300; i++)
-			asm("hlt");
-		Serial::log(ans);
-	}
-	Scheduler::killProcess(kernel_stage2proc);
+
 	while (1)
 	{
+		Mouse::paintMouse();
+		Scheduler::getCurrentThread()->sleepTimeLeft = 50;
+		Scheduler::getCurrentThread()->state = SLEEPING;
+		asm volatile("hlt");
 	}
 }
 

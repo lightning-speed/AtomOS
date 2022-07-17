@@ -40,7 +40,6 @@ namespace Scheduler
 	{
 		if (threadCount >= MAX_THREADS)
 			return nullptr;
-
 		thread_t *thread = (thread_t *)malloc(sizeof(thread_t));
 		//YES WE DO THIS
 		thread->stack = malloc(THREAD_STACK_SIZE);
@@ -54,7 +53,7 @@ namespace Scheduler
 		thread->regs->edi = 0;
 		thread->regs->esi = 0;
 		thread->regs->cs = 0x8;
-		thread->regs->ss = 0x30;
+		thread->regs->ss = 0x20;
 		thread->regs->eflags = 0x202;
 
 		//and THIS LINE IS USELESS, But I like it and therefore I left it there only
