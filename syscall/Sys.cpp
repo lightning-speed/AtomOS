@@ -10,6 +10,7 @@
 #include "../Glib/WindowManager.h"
 #include <FB.h>
 
+//some syscalls are not completed yet or are in test mode and hence have bad code
 namespace Sys
 {
 	void exit(register_t *regs)
@@ -63,8 +64,7 @@ namespace Sys
 		{
 		case 1:
 			regs->ecx = KeyboardManager::fetch(((process_t *)Scheduler::getCurrentThread()->parent)->keyboardHandler);
-			if (regs->ecx != 0 && regs->ecx != '\b')
-				CGA::printChar(regs->ecx);
+
 			break;
 
 		default:

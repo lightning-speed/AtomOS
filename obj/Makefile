@@ -1,5 +1,5 @@
 CC = i686-elf-g++
-CFLAGS = -c -m32 -std=c++11 -I ../include -w -fno-exceptions -O2
+CFLAGS = -c -m32 -std=c++11 -I ../include -w -fno-exceptions -O2 -mno-red-zone -pipe
 ASM = nasm
 AFLAGS  = -felf32
 CSRC = $(wildcard ../kernel/*.cpp)
@@ -18,7 +18,7 @@ all:
 	$(MAKE) Cbuild
 	$(MAKE) Dbuild
 	$(MAKE) Lbuild
-	$(MAKE) Sbuild
+	$(MAKE) Sbuild 
 	$(MAKE) Gbuild
 
 	$(MAKE) Link
@@ -34,7 +34,7 @@ Dbuild: $(DSRC)
 	$(CC) $(CFLAGS) $^ 
 
 Sbuild: $(SSRC)
-	$(CC) $(CFLAGS) $^ 	
+	$(CC)  $(CFLAGS) $^ 	
 
 Gbuild: $(GSRC)
 	$(CC) $(CFLAGS) $^ 	
