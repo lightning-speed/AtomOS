@@ -8,6 +8,8 @@
 #define PS2YSign 0b00100000
 #define PS2XOverflow 0b01000000
 #define PS2YOverflow 0b10000000
+#define mouse_size 7
+
 typedef struct
 {
     int X;
@@ -17,5 +19,6 @@ namespace Mouse
 {
     void init();
     void handler(register_t *regs);
-void ProcessMousePacket();
+    void paintMouse();
+    void ProcessMousePacket();
 };

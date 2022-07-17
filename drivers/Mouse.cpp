@@ -4,7 +4,7 @@
 #include <FB.h>
 
 using namespace IO;
-
+#define mouse_size 7
 #define MOUSE_ENABLE_PACKET 0xF4
 #define MOUSE_DISABLE_PACKET 0xF5
 #define MOUSE_USE_DEFAULT_SETTINGS 0xF6
@@ -16,6 +16,16 @@ int8_t buffer[3];
 int32_t mouseX = 100;
 int32_t mouseY = 100;
 char buttons;
+uint32_t px = 0, py = 0;
+uint32_t pbcolor[100];
+uint32_t mouse[] = {1, 0, 0, 0, 0, 0, 0,
+                    1, 1, 0, 0, 0, 0, 0,
+                    1, 0, 1, 1, 0, 0, 0,
+                    1, 0, 0, 0, 1, 1, 0,
+                    1, 0, 0, 0, 1, 1, 0,
+                    1, 0, 1, 1, 0, 0, 0,
+                    1, 1, 0, 0, 0, 0, 0,
+                    1, 0, 0, 0, 0, 0, 0};
 
 namespace Mouse
 {
@@ -75,9 +85,10 @@ namespace Mouse
         {
             if (buffer[1] != 0 || buffer[2] != 0)
             {
-                FB::setPixel(mouseX, mouseY, 0xffffffff);
-                mouseX += (int8_t)buffer[1];
-                mouseY += -((int8_t)buffer[2]);
+                offset = 41;
+                paintMouse();
+                offset = 0;
+
                 /*handler->OnMouseMove((int8_t)buffer[1], -((int8_t)buffer[2]));*/
             }
 
@@ -129,6 +140,35 @@ namespace Mouse
 
         // Enable the mouse.
         mouse_enable();
+    }
+    void paintMouse()
+    {
+        for (int i = 0; i < mouse_size; i++)
+            for (int j = 0; j < mouse_size; j++)
+                FB::setPixel(px + j, py + i, pbcolor[(i * mouse_size) + j]);
+        if (offset == 41)
+        {
+
+            mouseX += (int8_t)buffer[1];
+            mouseY += -((int8_t)buffer[2]);
+            if (mouseX < 3)
+                mouseX = 3;
+            else if (mouseX > FB::width - 10)
+                mouseX = FB::width - 10;
+            if (mouseY < 3)
+                mouseY = 3;
+            else if (mouseY > FB::height - 10)
+                mouseY = FB::height - 10;
+        }
+        for (int i = 0; i < mouse_size; i++)
+            for (int j = 0; j < mouse_size; j++)
+                pbcolor[(i * mouse_size) + j] = FB::getPixel(mouseX + j, mouseY + i);
+        for (int i = 0; i < mouse_size; i++)
+            for (int j = 0; j < mouse_size; j++)
+                if (mouse[(i * mouse_size) + j] == 1)
+                    FB::setPixel(mouseX + j, mouseY + i, 0xffffffff);
+        px = mouseX;
+        py = mouseY;
     }
 
 };

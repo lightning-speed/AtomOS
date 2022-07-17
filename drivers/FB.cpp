@@ -24,6 +24,10 @@ namespace FB
 	{
 		((uint32_t *)addr)[(y * FB::width) + x] = color;
 	}
+	uint32_t getPixel(int x, int y)
+	{
+		return ((uint32_t *)addr)[(y * FB::width) + x];
+	}
 	void setPixel(char *buff, int x, int y, uint32_t color)
 	{
 		uint32_t where = (x * 4 + y * pitch) / 4;

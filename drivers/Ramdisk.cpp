@@ -5,8 +5,7 @@
 char *Ramdisk::start;
 uint32_t Ramdisk::size;
 
-// JUST PLEASE IGNORE THIS CODE, FOR THE SAKE OF YOUR LIFE
-//THIS CODE HAS BECOME A CURSE
+// JUST IGNORE THIS CODE, FOR THE SAKE OF YOUR LIFE
 
 void Ramdisk::init()
 {
