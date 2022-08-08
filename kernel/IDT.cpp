@@ -99,10 +99,11 @@ extern "C" void exception_handler(register_t *regs)
 	}
 	CGA::print("\n\nException: ", 0x0c);
 	CGA::print((String)exception_messages[regs->int_no]);
-	CGA::print((String)(int)regs->eip);
+	CGA::print(" EIP: " + (String)(int)regs->eip + "\n");
 	Serial::log("\n\nException: ");
 	Serial::log((String)exception_messages[regs->int_no]);
-	Serial::log((String)(int)regs->eip);
+	Serial::log(" EIP: " + (String)(int)regs->eip + "\n");
+	Runtime::stackTrace();
 	if (regs->int_no == 13)
 	{
 		for (;;)

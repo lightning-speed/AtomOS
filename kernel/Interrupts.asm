@@ -40,9 +40,12 @@ global ex1
 interrupt_gate:
  cli
  pushall
- push esp
+ mov eax,esp
+ mov esp,0x500
+ push eax
  call interrupt_handler
- pop esp
+ pop eax
+ mov esp,eax
  popall
  add esp,4
  sti

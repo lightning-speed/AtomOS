@@ -28,7 +28,6 @@ process_t *kernel_stage2proc;
 extern "C" int kmain(uint32_t mb_sig, uint32_t mb_addr)
 {
 	//As Malloc is required everywhere we initalize it first
-	Runtime::clearThrash();
 	mm_init();
 
 	gdt_install();
@@ -52,6 +51,7 @@ extern "C" int kmain(uint32_t mb_sig, uint32_t mb_addr)
 		struct multiboot_info *mbinfo = (multiboot_info *)mb_addr;
 		multiboot_module_t *mod = (multiboot_module_t *)mbinfo->mods_addr;
 		Ramdisk::start = (char *)mod->mod_start;
+		Serial::log((String) "Ramdisk loaded at:" + (int)Ramdisk::start + "\n");
 		Ramdisk::size = mod->mod_start - (uint32_t)Ramdisk::start;
 		FB::init((char *)(mbinfo->framebuffer_addr), mbinfo->framebuffer_width, mbinfo->framebuffer_height, mbinfo->framebuffer_pitch);
 		CGA::init();
@@ -63,6 +63,7 @@ extern "C" int kmain(uint32_t mb_sig, uint32_t mb_addr)
 	Scheduler::killThread(kernel_stage1);
 	while (1)
 		;
+	return 0;
 }
 
 void kernel_stage2()
@@ -96,8 +97,7 @@ void kernel_stage2()
 	for (;;)
 	{
 	}*/
-
-	Runtime::exec("bin/cmd.exe", 0, nullptr, nullptr);
+	process_t *proc = Runtime::exec("bin/cmd.exe", 0, nullptr, nullptr);
 
 	while (1)
 	{

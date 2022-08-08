@@ -254,3 +254,19 @@ char *strcat(char *destination, const char *source)
 
 	return destination;
 }
+char *itoha(uint32_t it)
+{
+	char hex[] = "0123456789ABCDEF";
+	char *out = malloc(13) + 13;
+	for (int i = 12; i > -1; i--)
+	{
+		out[i] = 0;
+	}
+	while (it > 0)
+	{
+		out[0] = hex[(it & 15)];
+		out--;
+		it /= 16;
+	}
+	return out + 1;
+}

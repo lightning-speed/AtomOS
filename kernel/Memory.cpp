@@ -8,7 +8,7 @@ uint32_t m_end;
 uint32_t map_start;
 void mm_init()
 {
-	map_start = 0x200000;
+	map_start = 0x400000;
 	for (int i = 0; i < max_pages; i++)
 	{
 		pages_free[i] = 1;
@@ -16,15 +16,21 @@ void mm_init()
 	if (Serial::verboseOn)
 		Serial::log("Memory setup [Done]\n");
 }
-
-void memcpy(char *to, char *from, uint32_t size_to_move)
+extern "C" void memmove(char *to, char *from, uint32_t size_to_move)
 {
 	for (uint32_t i = 0; i < size_to_move; i++)
 	{
 		to[i] = from[i];
 	}
 }
-void memset(char *p, char c, uint32_t size)
+extern "C" void memcpy(char *to, char *from, uint32_t size_to_move)
+{
+	for (uint32_t i = 0; i < size_to_move; i++)
+	{
+		to[i] = from[i];
+	}
+}
+extern "C" void memset(char *p, char c, uint32_t size)
 {
 	for (uint32_t i = 0; i < size; i++)
 	{
@@ -93,6 +99,7 @@ char *malloc(uint32_t size)
 			}
 		}
 	}
+	Serial::log("\nKmemory fulll!\n");
 	return nullptr;
 }
 void free(char *addr)

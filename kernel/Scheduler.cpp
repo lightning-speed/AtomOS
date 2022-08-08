@@ -183,7 +183,8 @@ namespace Scheduler
 			return nullptr;
 		process_t *out = createProcess(name);
 		out->data = data;
-		out->keyboardHandler = KeyboardManager::create();
+		out->keyboardStream = CreateStream(1024);
+
 		addThreadToProcess(create(data, func), out);
 		Serial::log("Created Porcess [" + name + "]\n");
 		return out;
@@ -194,7 +195,8 @@ namespace Scheduler
 		asm volatile("cli");
 		if (proc == nullptr)
 			return;
-		KeyboardManager::del(proc->keyboardHandler);
+		DestoryStream(proc->keyboardStream);
+
 		for (int i = 0; i < proc->childrenCount; i++)
 		{
 			proc->children[i]->state = KILL_REQUESTED;
