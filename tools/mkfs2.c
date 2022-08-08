@@ -31,8 +31,8 @@ int exists(const char *fname)
 }
 int main(int argc, char **argv)
 {
-	disk = (char *)malloc(1024 * 1024);
-	for (int i = 0; i < 1024 * 512; i++)
+	disk = (char *)malloc(1024 * 1024 * 8);
+	for (int i = 0; i < 1024 * 1024 * 8; i++)
 	{
 		disk[i] = 0;
 	}
@@ -64,10 +64,10 @@ void addFile(char *name)
 	file->size = size;
 	file->cap = size;
 	file->writable = 0;
-	file->content = (char *)(1024 + content_index);
+	file->content = (char *)(10024 + content_index);
 	for (uint32_t i = 0; i < size; i++)
 	{
-		disk[1024 + content_index + i] = fgetc(f);
+		disk[10024 + content_index + i] = fgetc(f);
 	}
 	index += sizeof(file_t);
 	content_index += size;
@@ -75,8 +75,8 @@ void addFile(char *name)
 }
 void writefile()
 {
-	FILE *f = fopen(outputfilename, "wb");
-	for (int i = 0; i < 1024 + content_index; i++)
+	FILE *f = fopen(outputfilename, "wb+");
+	for (int i = 0; i < 10024 + content_index; i++)
 	{
 		fputc(disk[i], f);
 	}

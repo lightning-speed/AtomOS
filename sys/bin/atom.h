@@ -63,4 +63,5 @@ void swap_buffer(Window win);
 void fillRect(Window w, int x, int y, int width, int height);
 void setColor(uint32_t color);
 void swap_buffer_pos(Window win, uint32_t x, uint32_t y, uint32_t w, uint32_t h);
-int CreatePorcess(char **args, int argc, void *osteam, void *instream);
+void drawChar(Window w, char c, uint16_t x, uint16_t y);
+void drawButton(Window w, char *name, int x, int y, int width, int height);

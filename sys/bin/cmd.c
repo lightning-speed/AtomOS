@@ -29,19 +29,17 @@ void ls_path(char *path)
 }
 int main(int argc, char **argv)
 {
+
 	cbuffer = malloc(2048);
-	/*Window win = (Window)syscall(12, 0, 0, (300 << 8) | 100);
-	win->x = 100;
-	win->y = 100;
-	setColor(((255 << 24) | (0 * 27 << 16) | (0 * 17 << 8) | 0 * 10));
-	fillRect(win, 0, 0, 300, 100);
-	swap_buffer_pos(win, 0, 0, 300, 100);
-	for (int e = 0; e < 100; e++)
-	{
-		setColor(((255 << 24) | (e * 27 << 16) | (e * 17 << 8) | e * 10));
-		fillRect(win, e, e, 100, 100);
-		swap_buffer_pos(win, e, e, 100, 100);
-	}*/
+	Window win = (Window)syscall(12, 0, 0, 0);
+	win->x = 0;
+	win->y = 0;
+	setColor(toColor(255, 255, 255));
+	drawText(win, 160, 130, "Rust is disgusting!");
+	drawButton(win, "so true", 50, 300, 130, 24);
+	drawButton(win, "very correct", 250, 300, 130, 24);
+
+	sleep(12000);
 	printf("Atom cmd [Version 1.0.0]\nCopyright (c) 2022 Peko.  All rights reserved.\n\nType help for commands\n");
 	set_screen(0, 0x0f);
 	putchar('\n');

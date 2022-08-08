@@ -8,6 +8,7 @@
 #include <CMOS.h>
 #include <VFS.h>
 #include "../Glib/WindowManager.h"
+#include <Serial.h>
 #include <FB.h>
 
 //some syscalls are not completed yet or are in test mode and hence have bad code
@@ -26,12 +27,16 @@ namespace Sys
 		uint32_t stream = regs->ebx;
 		char *data = (char *)regs->ecx;
 		uint32_t len = regs->edx;
+		process_t *proc = ((process_t *)Scheduler::getCurrentThread()->parent);
 		switch (stream)
 		{
 		case 0:
 			if (len != 0)
 				for (uint32_t i = 0; i < len; i++)
-					CGA::print((char)data[i]);
+				{
+					CGA::printChar((char)data[i]);
+				}
+
 			else
 			{
 				CGA::printChar((char)((int)data));
@@ -63,8 +68,9 @@ namespace Sys
 		switch (stream)
 		{
 		case 1:
-			regs->ecx = KeyboardManager::fetch(((process_t *)Scheduler::getCurrentThread()->parent)->keyboardHandler);
-
+			regs->ecx = ((process_t *)Scheduler::getCurrentThread()->parent)->keyboardStream->fetch();
+			if (regs->ecx != '\b' && regs->ecx != 0)
+				CGA::printChar(regs->ecx);
 			break;
 
 		default:
@@ -111,6 +117,7 @@ namespace Sys
 	}
 	void alloc(register_t *regs)
 	{
+
 		switch (regs->ebx)
 		{
 		case 0:
@@ -200,10 +207,11 @@ namespace Sys
 	}
 	void wm(register_t *regs)
 	{
+		uint16_t *arrg;
 		switch (regs->ebx)
 		{
 		case 0:
-			regs->ecx = (uint32_t)WindowManager::create((String)(char *)regs->ecx, regs->ebx >> 8, regs->ebx & 65535, 1);
+			regs->ecx = (uint32_t)WindowManager::create((String)(char *)regs->ecx, 0);
 			break;
 		case 1:
 			regs->ecx = (uint32_t)FB::addr;
@@ -218,13 +226,26 @@ namespace Sys
 		case 4:
 			WindowManager::destroy((Window)regs->ecx);
 			break;
-
+		case 5:
+			arrg = (uint16_t *)regs->ecx;
+			FB::drawCharTransparent(arrg[0], arrg[1], arrg[2], regs->edx);
+			break;
 		default:
 			break;
 		}
 	}
-	void wg(register_t *regs)
+	void pg(register_t *regs)
 	{
+		thread_t *main_thread = (thread_t *)regs->ebx;
+		process_t *parent = (process_t *)main_thread->parent;
+		switch (regs->ecx)
+		{
+		case 0:
+			break;
+
+		default:
+			break;
+		}
 	}
 
 };

@@ -22,7 +22,7 @@ namespace Syscall
 		addSyscall(10, (void *)Sys::env);
 		addSyscall(11, (void *)Sys::rem);
 		addSyscall(12, (void *)Sys::wm);
-		addSyscall(13, (void *)Sys::wg);
+		addSyscall(13, (void *)Sys::pg);
 	}
 	void handler(register_t *regs)
 	{

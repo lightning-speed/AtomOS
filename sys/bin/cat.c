@@ -9,9 +9,13 @@ int main(int argc, char **argv)
 		FILE *f = fopen(argv[1], "r");
 		if (f != NULL)
 		{
-			for (int i = 0; i < fsize(f); i++)
+			int fsize;
+			fseek(f, 0, SEEK_END);
+			fsize = ftell(f);
+			fseek(f, 0, SEEK_SET);
+			for (int i = 0; i < fsize; i++)
 			{
-				putchar(fgetc(f));
+				putchar(getc(f));
 			}
 			fclose(f);
 		}
