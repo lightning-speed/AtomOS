@@ -37,14 +37,31 @@ namespace FB
 	{
 		for (uint64_t i = 0; i < 16; i++)
 		{
+			int r = ((i + y) * FB::width);
+			char f = FB::font[(c * 16) + i];
 			for (uint64_t j = 0; j < 8; j++)
 			{
-				if ((font[(c * 16) + i] & (0x80 >> j)) != 0)
+				if ((f & (0x80 >> j)) != 0)
 				{
-					setPixel(x + j, i + y, color);
+					((uint32_t *)FB::addr)[r + (x + j)] = color;
 				}
 				else
-					setPixel(x + j, i + y, backColor);
+					((uint32_t *)FB::addr)[r + (x + j)] = backColor;
+			}
+		}
+	}
+	void drawCharTransparent(uint64_t x, uint64_t y, char c, int color)
+	{
+		for (uint64_t i = 0; i < 16; i++)
+		{
+			int r = ((i + y) * FB::width);
+			char f = FB::font[(c * 16) + i];
+			for (uint64_t j = 0; j < 8; j++)
+			{
+				if ((f & (0x80 >> j)) != 0)
+				{
+					((uint32_t *)FB::addr)[r + (x + j)] = color;
+				}
 			}
 		}
 	}

@@ -15,9 +15,10 @@ namespace VFS
 	{
 		if (vn == nullptr)
 			return;
-		for (uint32_t i = 0; i < vn->size; i++, vfs_node->size++)
+		for (uint32_t i = 0; i < vn->size; i++)
 		{
 			vfs_node->children[vfs_node->size] = vn->children[i];
+			vfs_node->size++;
 		}
 		free((char *)vn);
 		Serial::log("New FS node mounted");
@@ -25,6 +26,7 @@ namespace VFS
 	int rename(fnode *file, char *name)
 	{
 		memcpy(file->name, name, 32);
+		return 0;
 	}
 	int del(fnode *file)
 	{
@@ -36,7 +38,7 @@ namespace VFS
 			//Finding the file in array
 			if ((fnode *)parent->children[i] == file)
 			{
-				for (int j = i; j < parent->size; j++)
+				for (uint32_t j = i; j < parent->size; j++)
 					parent->children[j] = parent->children[j + 1];
 				parent->size--;
 				return 1;
@@ -79,6 +81,7 @@ namespace VFS
 		node->size = 0;
 		return node;
 	}
+
 	fnode *openTree(char *pathc, char *prot)
 	{
 		char path[40];
@@ -92,6 +95,7 @@ namespace VFS
 			fnode *n = nullptr;
 			if (file == nullptr)
 			{
+				//Preventing Creation in Read Protocol
 				if (prot[0] == 'r')
 					return nullptr;
 				n = createFile(name);
@@ -137,11 +141,13 @@ namespace VFS
 				f->content[f->size] = data;
 				f->size++;
 			}
+		return 0;
 	}
 	int read(fnode *f, uint32_t index)
 	{
 		if (f->open)
 			return f->content[index];
+		return 0;
 	}
 	int setBuffer(fnode *node, char *buff, uint32_t size)
 	{
@@ -151,6 +157,10 @@ namespace VFS
 			node->size = size;
 			node->cap = size;
 			return 1;
+		}
+		else
+		{
+			Serial::log("\nFILE node was null\n");
 		}
 		return 0;
 	}

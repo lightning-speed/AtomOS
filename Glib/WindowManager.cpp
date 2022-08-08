@@ -14,23 +14,22 @@ namespace WindowManager
     }
     Window create(String name)
     {
-        return create(name, 300, 300, 1);
+        return create(name, 0);
     }
-    Window create(String name, uint16_t width, uint16_t height, int mode)
+    Window create(String name, int mode)
     {
         Window out = (Window)malloc(sizeof(window_t));
         out->name = name.buffer;
-        out->width = width;
-        out->height = height;
+        out->width = FB::width;
+        out->height = FB::height;
         out->x = 0;
         out->y = 0;
         if (mode == 0)
             out->buffer = (uint32_t *)FB::addr;
-        else
-            out->buffer = (uint32_t *)malloc(width * height * 4);
+
         return out;
     }
-    void drawChar(Window w, uint64_t x, uint64_t y, char c, int color)
+    void drawChar(Window w, uint64_t x, uint64_t y, char c, uint32_t color)
     {
         for (uint64_t i = 0; i < 16; i++)
         {

@@ -2,7 +2,7 @@
 #include <stdint.h>
 #include <IDT.h>
 #include <String.h>
-#include <KeyboardHandler.h>
+#include <Stream.h>
 
 #define THREAD_STACK_SIZE 0x10000
 #define MAX_THREADS 512
@@ -43,7 +43,7 @@ typedef struct
 	thread_t *children[40];
 	uint8_t childrenCount;
 	pdata_t *data;
-	KeyboardHandler keyboardHandler;
+	Stream *keyboardStream;
 
 } process_t;
 
@@ -77,6 +77,5 @@ namespace Scheduler
 	void pauseThread(thread_t *t);
 	void unpauseThread(thread_t *t);
 	void killProcess(process_t *proc);
-	void attachKeyboardHandler(process_t *proc, KeyboardHandler handler);
 	extern bool enabled;
 };

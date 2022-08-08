@@ -4,7 +4,6 @@
 #include <IO.h>
 #include <IDT.h>
 #include <Scheduler.h>
-#include <KeyboardHandler.h>
 #include "KeyboardScancodes.h"
 uint16_t ScanCode;
 bool CapsOn = 0;
@@ -55,8 +54,7 @@ namespace Keyboard
 
 			if (proc != nullptr)
 			{
-				proc->keyboardHandler->buffer[proc->keyboardHandler->index] = c;
-				proc->keyboardHandler->index++;
+				proc->keyboardStream->push(c);
 			}
 		}
 	}

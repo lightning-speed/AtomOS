@@ -13,6 +13,7 @@ namespace FB
 	void setPixel(char *buff, int x, int y, uint32_t color);
 	uint32_t getPixel(int x, int y);
 	void drawChar(uint64_t x, uint64_t y, char c, int color);
+	void drawCharTransparent(uint64_t x, uint64_t y, char c, int color);
 	void loadFont(fnode *f);
 	void drawTerminalAsciiChar(int x, int y, char c, int color);
 	void scroll();

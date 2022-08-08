@@ -29,3 +29,5 @@ char *toCA(int a);
 int strcmp(const char *lhs, const char *rhs);
 char *strtok(char *s, const char *delim);
 uint32_t strlen(const char *s);
+char *UItoCA(uint32_t a);
+char *itoha(uint32_t it);

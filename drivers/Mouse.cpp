@@ -2,7 +2,8 @@
 #include <Serial.h>
 #include <IO.h>
 #include <FB.h>
-
+#define MOUSE_OUT 0xffffffff
+#define MOUSE_IN 0
 using namespace IO;
 #define mouse_size 7
 #define MOUSE_ENABLE_PACKET 0xF4
@@ -18,12 +19,14 @@ int32_t mouseY = 100;
 char buttons;
 uint32_t px = 0, py = 0;
 uint32_t pbcolor[100];
+
+//Some day I will move this to a file(I am too lazy)
 uint32_t mouse[] = {1, 0, 0, 0, 0, 0, 0,
                     1, 1, 0, 0, 0, 0, 0,
-                    1, 0, 1, 1, 0, 0, 0,
-                    1, 0, 0, 0, 1, 1, 0,
-                    1, 0, 0, 0, 1, 1, 0,
-                    1, 0, 1, 1, 0, 0, 0,
+                    1, 2, 1, 1, 0, 0, 0,
+                    1, 2, 2, 2, 1, 1, 0,
+                    1, 2, 2, 2, 1, 1, 0,
+                    1, 2, 1, 1, 0, 0, 0,
                     1, 1, 0, 0, 0, 0, 0,
                     1, 0, 0, 0, 0, 0, 0};
 
@@ -166,7 +169,10 @@ namespace Mouse
         for (int i = 0; i < mouse_size; i++)
             for (int j = 0; j < mouse_size; j++)
                 if (mouse[(i * mouse_size) + j] == 1)
-                    FB::setPixel(mouseX + j, mouseY + i, 0xffffffff);
+                    FB::setPixel(mouseX + j, mouseY + i, MOUSE_OUT);
+                else if (mouse[(i * mouse_size) + j] == 2)
+                    FB::setPixel(mouseX + j, mouseY + i, MOUSE_IN);
+
         px = mouseX;
         py = mouseY;
     }

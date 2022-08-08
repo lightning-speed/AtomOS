@@ -146,7 +146,7 @@ namespace CGA
 	}
 	void init()
 	{
-		win = WindowManager::create("conhost", 640, 480, 0);
+		win = WindowManager::create("conhost", 0);
 		//Scheduler::create(nullptr, (void *)swap);
 	}
 };

@@ -2,6 +2,7 @@
 #include <CGA.h>
 #include <Memory.h>
 #include <VFS.h>
+#include <Serial.h>
 char *Ramdisk::start;
 uint32_t Ramdisk::size;
 
@@ -22,6 +23,7 @@ void Ramdisk::init()
 			return;
 		fnode *node = VFS::open(file->name, "w");
 		VFS::setBuffer(node, (char *)((uint32_t)(file->content) + disk), file->size);
+		Serial::log(((int)((uint32_t)(file->content) + disk)) + (String) "FR\n");
 		i += sizeof(file_t);
 		VFS::close(node);
 	}
