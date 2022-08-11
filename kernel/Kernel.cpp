@@ -21,6 +21,7 @@
 #include <FB.h>
 #include <Mouse.h>
 #include "../Glib/Window.h"
+#include <BitmapImage.h>
 
 void randomize_mem(uint32_t from, uint32_t till);
 void kernel_stage2();
@@ -77,26 +78,14 @@ void kernel_stage2()
 	fnode *fontFile = VFS::open("unifont.bin", "r");
 	FB::loadFont(fontFile);
 	VFS::close(fontFile);
+	//Splash Screen
+	fnode *image = VFS::open("image.bmp", "r");
+	BitmapImage::drawImage(0, 0, image->content, image->size);
+	VFS::close(image);
+	Scheduler::getCurrentThread()->sleepTimeLeft = 3000;
+	Scheduler::getCurrentThread()->state = SLEEPING;
+	asm volatile("hlt");
 	CGA::clearScreen();
-	/*fnode *icon = VFS::open("icon", "r");
-	uint8_t *c = (uint8_t *)icon->content;
-	for (int i = 0; i < 100; i++)
-	{
-		for (int j = 0; j < 100; j++)
-		{
-			uint32_t p;
-			char *rp = (char *)&p;
-			rp[0] = c[3];
-			rp[1] = c[1];
-			rp[2] = c[2];
-			rp[3] = c[0];
-			FB::setPixel(i, j, p);
-			c += 4;
-		}
-	}
-	for (;;)
-	{
-	}*/
 	process_t *proc = Runtime::exec("bin/cmd.exe", 0, nullptr, nullptr);
 
 	while (1)

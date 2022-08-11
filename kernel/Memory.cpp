@@ -8,13 +8,17 @@ uint32_t m_end;
 uint32_t map_start;
 void mm_init()
 {
-	map_start = 0x400000;
+	//1 MB of padding from heap_start
+	map_start = ((uint32_t)&heap_start) + 0x300000;
 	for (int i = 0; i < max_pages; i++)
 	{
 		pages_free[i] = 1;
 	}
 	if (Serial::verboseOn)
+	{
 		Serial::log("Memory setup [Done]\n");
+		Serial::log((String) "Heap Start at: " + (int)map_start + "\n");
+	}
 }
 extern "C" void memmove(char *to, char *from, uint32_t size_to_move)
 {
