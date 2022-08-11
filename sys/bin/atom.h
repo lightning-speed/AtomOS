@@ -59,9 +59,28 @@ typedef struct
 
 typedef window_t *Window;
 
+typedef struct
+{
+	char *text;
+	uint32_t color;
+	uint32_t background;
+	uint16_t x;
+	uint16_t y;
+	uint16_t width;
+	uint16_t height;
+	char type;
+} component_t;
+typedef component_t *Component;
+
 void swap_buffer(Window win);
 void fillRect(Window w, int x, int y, int width, int height);
 void setColor(uint32_t color);
 void swap_buffer_pos(Window win, uint32_t x, uint32_t y, uint32_t w, uint32_t h);
 void drawChar(Window w, char c, uint16_t x, uint16_t y);
 void drawButton(Window w, char *name, int x, int y, int width, int height);
+Component createButton(char *text, int x, int y);
+void drawCompoenent(Window w, Component c);
+Component createLabel(char *text, int x, int y, uint32_t color);
+uint32_t toColor(uint8_t r, uint8_t g, uint8_t b);
+int mouseX();
+int mouseY();

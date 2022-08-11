@@ -29,6 +29,8 @@ SECTIONS
         *(COMMON)
         *(.bss*)
     }
+		. += 0x1000;
+		heap_start = .;
 		KERNEL_END = .;
 		process_memory = 0x700000;   
 

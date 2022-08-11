@@ -1,1 +1,1 @@
-"C:\Users\Dell\OneDrive\Documents\PortableGit\git-bash.exe"
+"E:\git\git-bash.exe"

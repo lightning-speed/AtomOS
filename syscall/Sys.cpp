@@ -10,6 +10,7 @@
 #include "../Glib/WindowManager.h"
 #include <Serial.h>
 #include <FB.h>
+#include <Mouse.h>
 
 //some syscalls are not completed yet or are in test mode and hence have bad code
 namespace Sys
@@ -229,6 +230,12 @@ namespace Sys
 		case 5:
 			arrg = (uint16_t *)regs->ecx;
 			FB::drawCharTransparent(arrg[0], arrg[1], arrg[2], regs->edx);
+			break;
+		case 6:
+			regs->ecx = Mouse::mouseX;
+			break;
+		case 7:
+			regs->ecx = Mouse::mouseY;
 			break;
 		default:
 			break;

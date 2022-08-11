@@ -34,12 +34,9 @@ int main(int argc, char **argv)
 	Window win = (Window)syscall(12, 0, 0, 0);
 	win->x = 0;
 	win->y = 0;
-	setColor(toColor(255, 255, 255));
-	drawText(win, 160, 130, "Rust is disgusting!");
-	drawButton(win, "so true", 50, 300, 130, 24);
-	drawButton(win, "very correct", 250, 300, 130, 24);
+	Component button = createButton("Hello", 200, 200);
+	drawCompoenent(win, button);
 
-	sleep(12000);
 	printf("Atom cmd [Version 1.0.0]\nCopyright (c) 2022 Peko.  All rights reserved.\n\nType help for commands\n");
 	set_screen(0, 0x0f);
 	putchar('\n');

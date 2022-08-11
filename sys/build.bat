@@ -11,6 +11,6 @@ call acc sys/bin/cmd.c sys/bin/cmd.exe 0x700000
 
 
 cd sys
-..\tools\mkfs  bf.exe code.bf gnome.exe unifont.bin car.gnm bin/sw.exe bin/cmd.exe bin/cat.exe ramdisk
+..\tools\mkfs  bf.exe code.bf gnome.exe unifont.bin car.gnm bin/sw.exe bin/cmd.exe bin/cat.exe image.bmp ramdisk
 copy ramdisk ..\disk\ramdisk
 pause
