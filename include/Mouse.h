@@ -17,6 +17,7 @@ typedef struct
 } Point;
 namespace Mouse
 {
+    extern int mouseX, mouseY;
     void init();
     void handler(register_t *regs);
     void paintMouse();

@@ -5,8 +5,7 @@
 #define max_pages 30000
 #define mm_page_size 512
 
-extern uint32_t m_start;
-extern uint32_t m_end;
+extern "C" char heap_start[];
 
 bool is_page_free(uint32_t index);
 char *malloc(uint32_t size);

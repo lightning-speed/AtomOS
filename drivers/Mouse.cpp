@@ -2,7 +2,7 @@
 #include <Serial.h>
 #include <IO.h>
 #include <FB.h>
-#define MOUSE_OUT 0xffffffff
+#define MOUSE_OUT 0xfffffffe
 #define MOUSE_IN 0
 using namespace IO;
 #define mouse_size 7
@@ -14,12 +14,12 @@ using namespace IO;
 uint8_t offset = 0;
 /// Mouse communication data.
 int8_t buffer[3];
-int32_t mouseX = 100;
-int32_t mouseY = 100;
+int32_t Mouse::mouseX = 100;
+int32_t Mouse::mouseY = 100;
 char buttons;
 uint32_t px = 0, py = 0;
 uint32_t pbcolor[100];
-
+bool fm = 0;
 //Some day I will move this to a file(I am too lazy)
 uint32_t mouse[] = {1, 0, 0, 0, 0, 0, 0,
                     1, 1, 0, 0, 0, 0, 0,
@@ -143,12 +143,14 @@ namespace Mouse
 
         // Enable the mouse.
         mouse_enable();
+        //Copy the square as it will be further used when mouse will be moved and the part will be redrawn
     }
     void paintMouse()
     {
-        for (int i = 0; i < mouse_size; i++)
-            for (int j = 0; j < mouse_size; j++)
-                FB::setPixel(px + j, py + i, pbcolor[(i * mouse_size) + j]);
+        if (0xfffffffe == FB::getPixel(px, py))
+            for (int i = 0; i < mouse_size; i++)
+                for (int j = 0; j < mouse_size; j++)
+                    FB::setPixel(px + j, py + i, pbcolor[(i * mouse_size) + j]);
         if (offset == 41)
         {
 
