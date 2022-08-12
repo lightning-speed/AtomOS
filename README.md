@@ -3,6 +3,9 @@ A x86 Multitasking lightweight os written in C++
 
 ![image](https://user-images.githubusercontent.com/82322282/175992874-dc6d684a-d627-4a29-9ae4-5bbed286b5eb.png)
 
+![image](https://user-images.githubusercontent.com/82322282/184394310-00eabeeb-521d-4751-94fc-de47d85e3ee9.png)
+
+
 ## Running Gnome Lang
 
 ![image](https://user-images.githubusercontent.com/82322282/175992538-676984be-4523-471d-9191-ae7becf59843.png)
