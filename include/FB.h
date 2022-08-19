@@ -1,0 +1,29 @@
+#pragma once
+#include <stdint.h>
+#include <VFS.h>
+
+namespace FB
+{
+	extern int width, height, pitch;
+	extern char *addr;
+	extern char *font;
+	extern char *buff;
+	void init(char *addr, int width, int height, int pitch);
+	inline void setPixel(int x, int y, uint32_t color)
+	{
+		((uint32_t *)addr)[(y * width) + x] = color;
+	}
+	inline uint32_t getPixel(int x, int y)
+	{
+		return ((uint32_t *)addr)[(y * width) + x];
+	}
+	void setPixel(char *buff, int x, int y, uint32_t color);
+	void drawChar(uint64_t x, uint64_t y, char c, int color);
+	void drawCharBlock(uint64_t x, uint64_t y, char c, int color);
+	void loadFont(fnode *f);
+	void drawTerminalAsciiChar(int x, int y, char c, int color);
+	void scroll();
+	void clearScreen();
+	void repaint(char *buff);
+	void repaint(uint32_t *buff, int x, int y, int tox, int toy);
+}
