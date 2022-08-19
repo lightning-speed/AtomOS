@@ -6,9 +6,10 @@ A x86 Multitasking lightweight os written in C++
 ![image](https://user-images.githubusercontent.com/82322282/184394310-00eabeeb-521d-4751-94fc-de47d85e3ee9.png)
 
 
-## Running Gnome Lang
+## Running Image Viewer
 
-![image](https://user-images.githubusercontent.com/82322282/175992538-676984be-4523-471d-9191-ae7becf59843.png)
+![image](https://user-images.githubusercontent.com/82322282/185660231-ba15d149-1be1-4027-9736-4a2733e06ab5.png)
+
 
 ## Running Brain Fuck
 
