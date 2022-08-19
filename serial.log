@@ -1,76 +1,38 @@
 Scheduler setup [Done]
 Multiboot Verified
-Ramdisk loaded at:1191936
+Ramdisk loaded at:1196032
+Window Created [ conhost ]
 Created Porcess [kernel_stage2]
 New FS node mountedfile opened: bf.exe
-1201960FR
 file closed: bf.exe
 file opened: code.bf
-1382156FR
 file closed: code.bf
 file opened: gnome.exe
-1382267FR
 file closed: gnome.exe
 file opened: unifont.bin
-1594355FR
 file closed: unifont.bin
 file opened: car.gnm
-1598451FR
 file closed: car.gnm
 file opened: sw.exe
-1599234FR
 file closed: sw.exe
 file opened: cmd.exe
-1779430FR
 file closed: cmd.exe
 file opened: cat.exe
-1963962FR
 file closed: cat.exe
-file opened: image.bmp
-2139970FR
-file closed: image.bmp
+file opened: imv.exe
+file closed: imv.exe
+file opened: icon.bmp
+file closed: icon.bmp
 file opened: unifont.bin
 file closed: unifont.bin
-file opened: image.bmp
-file closed: image.bmp
+file opened: icon.bmp
+file closed: icon.bmp
 file opened: cmd.exe
 file closed: cmd.exe
 Created Porcess [cmd.exe]
-Scheduler setup [Done]
-Multiboot Verified
-Ramdisk loaded at:1191936
-Created Porcess [kernel_stage2]
-New FS node mountedfile opened: bf.exe
-1201960FR
-file closed: bf.exe
-file opened: code.bf
-1382156FR
-file closed: code.bf
-file opened: gnome.exe
-1382267FR
-file closed: gnome.exe
-file opened: unifont.bin
-1594355FR
-file closed: unifont.bin
-file opened: car.gnm
-1598451FR
-file closed: car.gnm
-file opened: sw.exe
-1599234FR
-file closed: sw.exe
-file opened: cmd.exe
-1779430FR
-file closed: cmd.exe
-file opened: cat.exe
-1963962FR
-file closed: cat.exe
-file opened: image.bmp
-2139970FR
-file closed: image.bmp
-file opened: unifont.bin
-file closed: unifont.bin
-file opened: image.bmp
-file closed: image.bmp
-file opened: cmd.exe
-file closed: cmd.exe
-Created Porcess [cmd.exe]
+file opened: imv.exe
+file closed: imv.exe
+Created Porcess [imv.exe]
+file opened: icon.bmp
+file closed: icon.bmp
+Window Created [ Image Viewer: icon.bmp ]

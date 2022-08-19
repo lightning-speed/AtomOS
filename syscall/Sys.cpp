@@ -12,25 +12,26 @@
 #include <FB.h>
 #include <Mouse.h>
 
-//some syscalls are not completed yet or are in test mode and hence have bad code
 namespace Sys
 {
 	void exit(register_t *regs)
 	{
+
 		if (Scheduler::getCurrentThread()->parent != nullptr)
-			CGA::print("\nProcess [" + ((process_t *)(Scheduler::getCurrentThread()->parent))->name + "]: Killed with exit code " + (int)regs->ebx + "\n", 0x0d);
+			CGA::print("\nProcess [" + Scheduler::parentProcess(Scheduler::getCurrentThread())->name + "]: Killed with exit code " + string(regs->ebx) + '\n', 0x0d);
 		else
-			CGA::print((String) "\nProcess [unknown]: Killed with exit code " + (int)regs->ebx + "\n", 0x0d);
-		Runtime::kill((process_t *)Scheduler::getCurrentThread()->parent);
+			CGA::print((string) "\nProcess [unknown]: Killed with exit code " + string(regs->ebx) + '\n', 0x0d);
+		Runtime::kill(Scheduler::parentProcess(Scheduler::getCurrentThread()));
 	}
 	void write(register_t *regs)
 	{
 		uint32_t stream = regs->ebx;
 		char *data = (char *)regs->ecx;
 		uint32_t len = regs->edx;
-		process_t *proc = ((process_t *)Scheduler::getCurrentThread()->parent);
+		process_t *proc = Scheduler::parentProcess(Scheduler::getCurrentThread());
 		switch (stream)
 		{
+		//STDOUT
 		case 0:
 			if (len != 0)
 				for (uint32_t i = 0; i < len; i++)
@@ -43,6 +44,7 @@ namespace Sys
 				CGA::printChar((char)((int)data));
 			}
 			break;
+		//STDERR
 		case 2:
 			CGA::screenColor = 0x0c;
 			if (len != 0)
@@ -54,6 +56,7 @@ namespace Sys
 			}
 			CGA::screenColor = 0x0f;
 			break;
+		//FILE WRITE
 		default:
 			if (len == 0)
 				VFS::write((fnode *)stream, (char)((int)data));
@@ -68,12 +71,13 @@ namespace Sys
 		uint32_t stream = regs->ebx;
 		switch (stream)
 		{
+		//STDIN
 		case 1:
-			regs->ecx = ((process_t *)Scheduler::getCurrentThread()->parent)->keyboardStream->fetch();
+			regs->ecx = Scheduler::parentProcess(Scheduler::getCurrentThread())->keyboardStream->fetch();
 			if (regs->ecx != '\b' && regs->ecx != 0)
 				CGA::printChar(regs->ecx);
 			break;
-
+		//FILE READ
 		default:
 			if (regs->edx == 0)
 				regs->ecx = VFS::read((fnode *)stream, regs->ecx);
@@ -99,23 +103,22 @@ namespace Sys
 	{
 		char **args = (char **)regs->ecx;
 		process_t *proc = Runtime::exec(args[0], regs->ebx, (char **)args, (char **)regs->edx);
+
+		if (proc == nullptr)
+		{
+			//TRY WITH .exe if only file name is given
+			proc = Runtime::exec((string)args[0] + ".exe", regs->ebx, (char **)args, (char **)regs->edx);
+		}
 		if (proc != nullptr)
-		{
 			regs->ecx = (uint32_t)proc->children[0];
-		}
 		else
-		{
-			proc = Runtime::exec((String)args[0] + ".exe", regs->ebx, (char **)args, (char **)regs->edx);
-			if (proc != nullptr)
-				regs->ecx = (uint32_t)proc->children[0];
-			else
-				regs->ecx = (uint32_t) nullptr;
-		}
+			regs->ecx = (uint32_t) nullptr;
 	}
 	void sleep(register_t *regs)
 	{
-		Scheduler::sleepThread(Scheduler::getCurrentThread(), regs->ebx);
+		Scheduler::sleep(regs->ebx);
 	}
+	//NOT IN USE FOR NOW
 	void alloc(register_t *regs)
 	{
 
@@ -208,11 +211,11 @@ namespace Sys
 	}
 	void wm(register_t *regs)
 	{
-		uint16_t *arrg;
+		uint32_t *arrg;
 		switch (regs->ebx)
 		{
 		case 0:
-			regs->ecx = (uint32_t)WindowManager::create((String)(char *)regs->ecx, 0);
+			regs->ecx = (uint32_t)WindowManager::create(string((char *)regs->ecx), 1);
 			break;
 		case 1:
 			regs->ecx = (uint32_t)FB::addr;
@@ -228,8 +231,8 @@ namespace Sys
 			WindowManager::destroy((Window)regs->ecx);
 			break;
 		case 5:
-			arrg = (uint16_t *)regs->ecx;
-			FB::drawCharTransparent(arrg[0], arrg[1], arrg[2], regs->edx);
+			arrg = (uint32_t *)regs->edx;
+			WindowManager::drawChar((Window)regs->ecx, arrg[0], arrg[1], arrg[2], arrg[3]);
 			break;
 		case 6:
 			regs->ecx = Mouse::mouseX;
@@ -237,19 +240,9 @@ namespace Sys
 		case 7:
 			regs->ecx = Mouse::mouseY;
 			break;
-		default:
+		case 8:
+			regs->ecx = ((process_t *)Scheduler::getCurrentThread()->parent)->mouseStream->fetch();
 			break;
-		}
-	}
-	void pg(register_t *regs)
-	{
-		thread_t *main_thread = (thread_t *)regs->ebx;
-		process_t *parent = (process_t *)main_thread->parent;
-		switch (regs->ecx)
-		{
-		case 0:
-			break;
-
 		default:
 			break;
 		}

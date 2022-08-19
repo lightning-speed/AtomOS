@@ -2,6 +2,9 @@
 #include <CGA.h>
 #include "Sys.h"
 #include <Serial.h>
+
+#define SYSCALLS_COUNT 14
+
 void *Syscall::syscall_functions[64];
 namespace Syscall
 {
@@ -22,16 +25,16 @@ namespace Syscall
 		addSyscall(10, (void *)Sys::env);
 		addSyscall(11, (void *)Sys::rem);
 		addSyscall(12, (void *)Sys::wm);
-		addSyscall(13, (void *)Sys::pg);
 	}
-	void handler(register_t *regs)
+	extern inline void handler(register_t *regs)
 	{
-		if (syscall_functions[regs->eax] != nullptr)
-			((void (*)(register_t *))(void *)syscall_functions[regs->eax])(regs);
+		uint32_t syscall_code = regs->eax;
+		if (syscall_code < SYSCALLS_COUNT)
+			((void (*)(register_t *))(void *)syscall_functions[syscall_code])(regs);
 		else
 		{
 			CGA::print("Wrong syscall called");
-			Serial::log("Wrong syscall called: " + ((String)(int)regs->eax) + " eip: " + (String)(int)regs->eip + "\n");
+			Serial::log("Wrong syscall called: " + ((string)(int)regs->eax) + " eip: " + (string)(int)regs->eip + "\n");
 		}
 	}
 	void addSyscall(uint16_t call_number, void *function)
