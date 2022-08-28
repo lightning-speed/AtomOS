@@ -3,6 +3,7 @@
 #include <IDT.h>
 #include <String.h>
 #include <Stream.h>
+#include <lib.h>
 
 #define THREAD_STACK_SIZE 0x10000
 #define MAX_THREADS 512
@@ -50,14 +51,12 @@ typedef struct
 
 namespace Scheduler
 {
-	extern thread_t *threads[];
+	extern List threads;
 	extern bool isScheduling;
 	extern thread_t *runningThreads[];
-	extern process_t *processes[];
+	extern List processes;
 	extern uint16_t currentThreadIndex;
 	extern uint64_t timePassedSinceReschedule;
-	extern uint16_t processCount;
-	extern uint16_t threadCount;
 	extern uint16_t runningThreadCount;
 	extern int CPUUsage;
 

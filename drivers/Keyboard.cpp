@@ -41,7 +41,7 @@ namespace Keyboard
 				c = codes[ScanCode];
 			Keyboard::CharPressed = c;
 
-			process_t *proc = (process_t *)(Scheduler::processes[Scheduler::processCount - 1]);
+			process_t *proc = (process_t *)Scheduler::processes.end();
 			//THIS IS A TEMPERORY CODE AND IS JUST FOR TEST
 			if ((c == 'c' || c == 'C') && CtrlPressed == true)
 			{
