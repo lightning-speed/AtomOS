@@ -22,6 +22,7 @@
 #include <Mouse.h>
 #include "../Glib/Window.h"
 #include <BitmapImage.h>
+#include <RMm.h>
 
 void randomize_mem(uint32_t from, uint32_t till);
 void kernel_stage2();
@@ -83,6 +84,7 @@ void kernel_stage2()
 	VFS::close(image);
 	Scheduler::sleep(2000);
 	CGA::clearScreen();
+	RMm::init();
 	process_t *proc = Runtime::exec("sys/cmd.exe", 0, nullptr, nullptr);
 
 	while (1)
