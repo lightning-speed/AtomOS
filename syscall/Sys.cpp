@@ -1,6 +1,5 @@
 #include "Sys.h"
 #include <CGA.h>
-#include <Scheduler.h>
 #include <Keyboard.h>
 #include <FS.h>
 #include <Runtime.h>
@@ -11,24 +10,28 @@
 #include <Serial.h>
 #include <FB.h>
 #include <Mouse.h>
-
+#include <RMm.h>
+process_t *Sys::SyscallProcess;
 namespace Sys
+
 {
 	void exit(register_t *regs)
 	{
-
-		if (Scheduler::getCurrentThread()->parent != nullptr)
-			CGA::print("\nProcess [" + Scheduler::parentProcess(Scheduler::getCurrentThread())->name + "]: Killed with exit code " + string(regs->ebx) + '\n', 0x0d);
+		if (SyscallProcess != nullptr)
+		{
+			CGA::print("\nProcess [" + SyscallProcess->name + "]: Killed with exit code " + string(regs->ebx) + '\n', 0x0d);
+			RMm::free(SyscallProcess);
+		}
 		else
 			CGA::print((string) "\nProcess [unknown]: Killed with exit code " + string(regs->ebx) + '\n', 0x0d);
-		Runtime::kill(Scheduler::parentProcess(Scheduler::getCurrentThread()));
+		Runtime::kill(SyscallProcess);
 	}
 	void write(register_t *regs)
 	{
 		uint32_t stream = regs->ebx;
 		char *data = (char *)regs->ecx;
 		uint32_t len = regs->edx;
-		process_t *proc = Scheduler::parentProcess(Scheduler::getCurrentThread());
+		process_t *proc = SyscallProcess;
 		switch (stream)
 		{
 		//STDOUT
@@ -73,7 +76,7 @@ namespace Sys
 		{
 		//STDIN
 		case 1:
-			regs->ecx = Scheduler::parentProcess(Scheduler::getCurrentThread())->keyboardStream->fetch();
+			regs->ecx = SyscallProcess->keyboardStream->fetch();
 			if (regs->ecx != '\b' && regs->ecx != 0)
 				CGA::printChar(regs->ecx);
 			break;
@@ -118,20 +121,13 @@ namespace Sys
 	{
 		Scheduler::sleep(regs->ebx);
 	}
-	//NOT IN USE FOR NOW
 	void alloc(register_t *regs)
 	{
 
 		switch (regs->ebx)
 		{
 		case 0:
-			regs->ecx = (uint32_t)malloc(regs->ecx);
-			break;
-		case 1:
-			regs->ecx = (uint32_t)realloc((char *)regs->ecx, regs->edx);
-			break;
-		case 2:
-			free((char *)regs->ecx);
+			regs->ecx = (uint32_t)RMm::request(SyscallProcess)->start;
 			break;
 		default:
 			break;
@@ -196,7 +192,7 @@ namespace Sys
 		switch (regs->ebx)
 		{
 		case 0:
-			regs->ecx = (uint32_t)(((process_t *)Scheduler::getCurrentThread()->parent)->data->env);
+			regs->ecx = (uint32_t)SyscallProcess->data->env;
 		}
 	}
 	void rem(register_t *regs)
@@ -241,7 +237,7 @@ namespace Sys
 			regs->ecx = Mouse::mouseY;
 			break;
 		case 8:
-			regs->ecx = ((process_t *)Scheduler::getCurrentThread()->parent)->mouseStream->fetch();
+			regs->ecx = SyscallProcess->mouseStream->fetch();
 			break;
 		default:
 			break;

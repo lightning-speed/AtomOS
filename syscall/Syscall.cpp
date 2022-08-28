@@ -2,6 +2,7 @@
 #include <CGA.h>
 #include "Sys.h"
 #include <Serial.h>
+#include <Scheduler.h>
 
 #define SYSCALLS_COUNT 14
 
@@ -29,6 +30,7 @@ namespace Syscall
 	extern inline void handler(register_t *regs)
 	{
 		uint32_t syscall_code = regs->eax;
+		Sys::SyscallProcess = Scheduler::parentProcess(Scheduler::getCurrentThread());
 		if (syscall_code < SYSCALLS_COUNT)
 			((void (*)(register_t *))(void *)syscall_functions[syscall_code])(regs);
 		else

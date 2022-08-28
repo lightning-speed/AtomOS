@@ -1,21 +1,20 @@
 #include <Scheduler.h>
 #include <CGA.h>
 #include <Memory.h>
-#include <lib.h>
 #include <PIT.h>
 #include <Serial.h>
-thread_t *Scheduler::threads[512];
+
+//NOT USING LIST FOR THREADS FOR FAST ACCESS
+List Scheduler::threads;
+List Scheduler::processes;
+
 thread_t *Scheduler::runningThreads[512];
 
 bool Scheduler::enabled = false;
 bool Scheduler::isScheduling = false;
 
-uint16_t Scheduler::threadCount = 0;
 uint16_t Scheduler::currentThreadIndex = 0;
-uint16_t Scheduler::processCount = 0;
 uint16_t Scheduler::runningThreadCount = 0;
-
-process_t *Scheduler::processes[512];
 
 uint64_t Scheduler::timePassedSinceReschedule = 0;
 
@@ -37,15 +36,14 @@ namespace Scheduler
 		PIT::init();
 		idle_thread = create(nullptr, (void *)idle);
 		//Removes the idle thread As we will only need it when there is not thread to run
-		threads[threadCount - 1] = nullptr;
-		threadCount--;
+		threads.pop();
 
 		if (Serial::verboseOn)
 			Serial::log("Scheduler setup [Done]\n");
 	}
 	thread_t *create(pdata_t *data, void *func)
 	{
-		if (threadCount >= MAX_THREADS)
+		if (threads.size >= MAX_THREADS)
 			return nullptr;
 		thread_t thread;
 		//YES WE DO THIS
@@ -63,8 +61,7 @@ namespace Scheduler
 		thread.regs->eip = (uint32_t)func;
 		thread.regs->esp = (uint32_t)thread.stack + THREAD_STACK_SIZE;
 		thread_t *out = (thread_t *)kernel_clone(&thread, sizeof(thread_t));
-		threads[threadCount] = out;
-		threadCount++;
+		threads.push(out);
 		if (!enabled)
 			reSchedule();
 		return out;
@@ -98,25 +95,26 @@ namespace Scheduler
 	void reSchedule()
 	{
 		runningThreadCount = 0;
-		for (uint16_t i = 0; i < threadCount; i++)
+		uint16_t len = threads.size;
+		for (uint16_t i = 0; i < len; i++)
 		{
-
-			if (threads[i]->state == RUNNING)
+			thread_t *thread = (thread_t *)threads.at(i);
+			if (thread->state == RUNNING)
 			{
-				runningThreads[runningThreadCount] = threads[i];
+				runningThreads[runningThreadCount] = thread;
 				runningThreadCount++;
 			}
-			else if (threads[i]->state == SLEEPING)
+			else if (thread->state == SLEEPING)
 			{
 
-				if (threads[i]->sleepTimeLeft <= timePassedSinceReschedule)
+				if (thread->sleepTimeLeft <= timePassedSinceReschedule)
 				{
-					threads[i]->state = RUNNING;
+					thread->state = RUNNING;
 				}
 				else
-					threads[i]->sleepTimeLeft -= timePassedSinceReschedule;
+					thread->sleepTimeLeft -= timePassedSinceReschedule;
 			}
-			else if (threads[i]->state == KILL_REQUESTED)
+			else if (thread->state == KILL_REQUESTED)
 			{
 
 				removeThreadAt(i);
@@ -153,20 +151,16 @@ namespace Scheduler
 	}
 	void removeThreadAt(uint16_t index)
 	{
-		threads[index]->state = KILLED;
-		free(threads[index]->stack);
-		free((char *)threads[index]->regs);
-		free((char *)threads[index]);
-		//Bringing each thread one index back
-		for (uint16_t i = index; i < threadCount; i++)
-		{
-			threads[i] = threads[i + 1];
-		}
-		threadCount--;
+		thread_t *thread = ((thread_t *)threads.at(index));
+		thread->state = KILLED;
+		free(thread->stack);
+		free((char *)thread->regs);
+		free((char *)thread);
+		threads.removeAt(index);
 	}
 	uint16_t allocPID()
 	{
-		return processCount + 1;
+		return processes.size + 1;
 	}
 	process_t *createProcess(string name)
 	{
@@ -175,18 +169,17 @@ namespace Scheduler
 		out->name = name;
 		out->pid = allocPID();
 		out->childrenCount = 0;
-		processes[processCount] = out;
-		processCount++;
+		processes.push(out);
 		return out;
 	}
 	process_t *createProcess(string name, pdata_t *data, void *func)
 	{
 
-		if (processCount >= MAX_PROCESSES)
+		if (processes.size >= MAX_PROCESSES)
 			return nullptr;
 		process_t *out = createProcess(name);
 		out->data = data;
-		out->keyboardStream = StreamManager::CreateStream(1024);
+		out->keyboardStream = StreamManager::CreateStream(20);
 		out->mouseStream = StreamManager::CreateStream(50);
 		addThreadToProcess(create(data, func), out);
 		Serial::log("Created Porcess [" + name + "]\n");
@@ -205,20 +198,7 @@ namespace Scheduler
 		{
 			proc->children[i]->state = KILL_REQUESTED;
 		}
-		for (uint32_t i = 0; i < processCount; i++)
-		{
-			//Checking if the i'th process is proc or not
-			if (processes[i] == proc)
-			{
-				//Bringing each process back by one index
-				for (uint32_t j = i; j < processCount; j++)
-				{
-					processes[i] = processes[i + 1];
-				}
-				break;
-			}
-		}
-		processCount--;
+		processes.remove(proc);
 		free((char *)proc);
 		Serial::log("Killed Porcess [" + proc->name + "]\n");
 		enableInt();
@@ -245,6 +225,6 @@ namespace Scheduler
 	}
 	process_t *activeProcess()
 	{
-		return processes[processCount - 1];
+		return (process_t *)processes.end();
 	}
 };
