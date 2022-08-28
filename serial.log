@@ -1,6 +1,6 @@
 Scheduler setup [Done]
 Multiboot Verified
-Ramdisk loaded at:1196032
+Ramdisk loaded at:1196032ðSÿ6032ðSÿ
 Window Created [ conhost ]
 Created Porcess [kernel_stage2]
 New FS node mountedfile opened: bf.exe
@@ -30,9 +30,104 @@ file closed: icon.bmp
 file opened: cmd.exe
 file closed: cmd.exe
 Created Porcess [cmd.exe]
-file opened: imv.exe
-file closed: imv.exe
-Created Porcess [imv.exe]
-file opened: icon.bmp
-file closed: icon.bmp
-Window Created [ Image Viewer: icon.bmp ]
+Provided RMm Block to cmd.exe
+file closed: 
+file closed: 
+file closed: 
+file closed: 
+file closed: 
+file closed: 
+file closed: 
+file closed: 
+file closed: 
+file closed: 
+file closed: 
+file closed: 
+file closed: 
+file closed: 
+file closed: 
+file closed: 
+file closed: 
+file closed: 
+file closed: 
+file closed: 
+file closed: 
+file closed: 
+file closed: 
+file closed: 
+file closed: 
+file closed: 
+file closed: 
+file closed: 
+file closed: 
+file closed: 
+file closed: 
+file closed: 
+file closed: 
+file closed: 
+file closed: 
+file closed: 
+file closed: 
+file closed: 
+file closed: 
+file closed: 
+file closed: 
+file closed: 
+file closed: 
+file closed: 
+file closed: 
+file closed: 
+file closed: 
+file closed: 
+file closed: 
+file closed: 
+file closed: 
+file closed: 
+file closed: 
+file closed: 
+file closed: 
+file closed: 
+file closed: 
+file closed: 
+file closed: 
+file closed: 
+file closed: 
+file closed: 
+file closed: 
+file closed: 
+file closed: 
+file closed: 
+file closed: 
+file closed: 
+file closed: 
+file closed: 
+file closed: 
+file closed: 
+file closed: 
+file closed: 
+file closed: 
+file closed: 
+file closed: 
+file closed: 
+file closed: 
+file closed: 
+file closed: 
+file closed: 
+file closed: 
+file closed: 
+file closed: 
+file closed: 
+file closed: 
+file closed: 
+file closed: 
+file closed: 
+file closed: 
+file closed: 
+file closed: 
+file closed: 
+file closed: 
+file closed: 
+file closed: 
+file closed: 
+file closed: 
+file closed: 
