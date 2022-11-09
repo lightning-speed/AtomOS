@@ -1,7 +1,7 @@
 #include <RMm.h>
 #include <Serial.h>
 #define MAX_HEAP_BLOCKS 50
-#define HEAP_BLOCK_SIZE 0x200000
+#define HEAP_BLOCK_SIZE 0x500000
 #define HEAP_BASE 0x1900000
 HeapBlock blocks[MAX_HEAP_BLOCKS];
 bool RMm::initalized = false;
@@ -23,7 +23,7 @@ namespace RMm
             RMm::init();
         if (proc == nullptr)
             return nullptr;
-        HeapBlock *out;
+        HeapBlock *out = (HeapBlock *)malloc(sizeof(HeapBlock));
         for (int i = 0; i < MAX_HEAP_BLOCKS; i++)
         {
             if (!blocks[i].inUse)
@@ -36,7 +36,6 @@ namespace RMm
         out->user = proc;
         out->inUse = true;
 
-        Serial::log("Provided RMm Block to " + proc->name + '\n');
         return out;
     }
     void free(process_t *proc)
@@ -55,6 +54,5 @@ namespace RMm
                 blocks[i].inUse = false;
                 break;
             }
-        Serial::log("Snached RMm Block from " + proc->name + '\n');
     }
 };

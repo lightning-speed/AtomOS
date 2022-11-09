@@ -6,9 +6,10 @@
 
 //NOT USING LIST FOR THREADS FOR FAST ACCESS
 List Scheduler::threads;
-List Scheduler::processes;
 
-thread_t *Scheduler::runningThreads[512];
+SpinLock Scheduler::spinLock;
+
+List Scheduler::runningThreads;
 
 bool Scheduler::enabled = false;
 bool Scheduler::isScheduling = false;
@@ -34,18 +35,18 @@ namespace Scheduler
 
 		enabled = true;
 		PIT::init();
-		idle_thread = create(nullptr, (void *)idle);
+		idle_thread = createThread(nullptr,nullptr, (void *)idle);
 		//Removes the idle thread As we will only need it when there is not thread to run
 		threads.pop();
-
-		if (Serial::verboseOn)
-			Serial::log("Scheduler setup [Done]\n");
 	}
-	thread_t *create(pdata_t *data, void *func)
+	thread_t *createThread(void* parentProcess,pdata_t *data, void *func)
 	{
+		spinLock.acquire();
+		
 		if (threads.size >= MAX_THREADS)
 			return nullptr;
 		thread_t thread;
+		thread.header = 0x6969;
 		//YES WE DO THIS
 		thread.stack = malloc(THREAD_STACK_SIZE);
 		thread.state = RUNNING;
@@ -55,15 +56,19 @@ namespace Scheduler
 		thread.regs->cs = 0x8;
 		thread.regs->ss = 0x20;
 		thread.regs->eflags = 0x202;
-
 		//and THIS LINE IS USELESS, But I like it and therefore I left it there only
 		thread.regs->int_no = 0;
 		thread.regs->eip = (uint32_t)func;
 		thread.regs->esp = (uint32_t)thread.stack + THREAD_STACK_SIZE;
+
+		thread.locked = false;
+		thread.parent = parentProcess;
 		thread_t *out = (thread_t *)kernel_clone(&thread, sizeof(thread_t));
+		
 		threads.push(out);
 		if (!enabled)
 			reSchedule();
+		spinLock.release();
 		return out;
 	}
 
@@ -71,22 +76,21 @@ namespace Scheduler
 	{
 
 		//Saves the register state
-
-		*(runningThreads[currentThreadIndex]->regs) = *regs;
+		*(((thread_t *)runningThreads.at(currentThreadIndex))->regs) = *regs;
 
 		//Change the thread index to next thread
-
-		currentThreadIndex++;
+		do{currentThreadIndex++;}
+		while(((thread_t *)runningThreads.at(currentThreadIndex))->locked==true&&runningThreads.length()<currentThreadIndex);
 
 		//Reschedule if end or the array is reached
 
-		if (currentThreadIndex == runningThreadCount)
+		if (currentThreadIndex >= runningThreads.length())
 		{
 			reSchedule();
 		}
 
 		//Set the Int regs to thread's reg
-		*regs = *(runningThreads[currentThreadIndex]->regs);
+		*regs = *(((thread_t *)runningThreads.at(currentThreadIndex))->regs);
 
 		//ADDs  (time passed since last interrupt call) to the total count of time passed since last reschedule
 
@@ -94,44 +98,42 @@ namespace Scheduler
 	}
 	void reSchedule()
 	{
-		runningThreadCount = 0;
-		uint16_t len = threads.size;
-		for (uint16_t i = 0; i < len; i++)
+		runningThreads.flush();
+		for (uint16_t i = 0; i < (uint16_t)threads.length();  i++)
 		{
 			thread_t *thread = (thread_t *)threads.at(i);
-			if (thread->state == RUNNING)
-			{
-				runningThreads[runningThreadCount] = thread;
-				runningThreadCount++;
-			}
-			else if (thread->state == SLEEPING)
-			{
-
-				if (thread->sleepTimeLeft <= timePassedSinceReschedule)
+			if(thread!=nullptr&&thread->regs!=nullptr){
+				if (thread->state == RUNNING)
 				{
-					thread->state = RUNNING;
+					runningThreads.push(thread);
 				}
-				else
-					thread->sleepTimeLeft -= timePassedSinceReschedule;
-			}
-			else if (thread->state == KILL_REQUESTED)
-			{
+				else if (thread->state == SLEEPING)
+				{
 
-				removeThreadAt(i);
+					if (thread->sleepTimeLeft <= timePassedSinceReschedule)
+					{
+						thread->state = RUNNING;
+					}
+					else
+						thread->sleepTimeLeft -= timePassedSinceReschedule;
+				}
+				else if(thread->state == KILL_REQUESTED){
+					removeThread(thread);
+					i--;
+				}
 			}
+			
 		}
-		if (runningThreadCount == 0)
+		if (runningThreads.length()==0)
 		{
-			runningThreads[0] = idle_thread;
-			runningThreadCount++;
+			runningThreads.push(idle_thread);
 		}
-		runningThreads[runningThreadCount] = (thread_t *)nullptr;
 		currentThreadIndex = 0;
 		timePassedSinceReschedule = 0;
 	}
 	thread_t *getCurrentThread()
 	{
-		return runningThreads[currentThreadIndex];
+		return (thread_t*)runningThreads.at(currentThreadIndex);
 	}
 	void sleepThread(thread_t *thread, uint64_t milliseconds)
 	{
@@ -146,75 +148,19 @@ namespace Scheduler
 
 	void killThread(thread_t *thread)
 	{
-		if (thread != nullptr)
-			thread->state = KILL_REQUESTED;
+		if(thread==nullptr||thread->locked||thread->state==KILL_REQUESTED)return;
+		thread->state = KILL_REQUESTED;
+		thread->locked = true;
+		
 	}
-	void removeThreadAt(uint16_t index)
+	void removeThread(thread_t * thread)
 	{
-		thread_t *thread = ((thread_t *)threads.at(index));
-		thread->state = KILLED;
-		free(thread->stack);
-		free((char *)thread->regs);
-		free((char *)thread);
-		threads.removeAt(index);
+		if(spinLock.locked==false){
+			threads.remove(thread);
+			thread->state = KILLED;
+	    	}
 	}
-	uint16_t allocPID()
-	{
-		return processes.size + 1;
-	}
-	process_t *createProcess(string name)
-	{
-
-		process_t *out = (process_t *)malloc(sizeof(process_t));
-		out->name = name;
-		out->pid = allocPID();
-		out->childrenCount = 0;
-		processes.push(out);
-		return out;
-	}
-	process_t *createProcess(string name, pdata_t *data, void *func)
-	{
-
-		if (processes.size >= MAX_PROCESSES)
-			return nullptr;
-		process_t *out = createProcess(name);
-		out->data = data;
-		out->keyboardStream = StreamManager::CreateStream(20);
-		out->mouseStream = StreamManager::CreateStream(50);
-		addThreadToProcess(create(data, func), out);
-		Serial::log("Created Porcess [" + name + "]\n");
-		return out;
-	}
-
-	void killProcess(process_t *proc)
-	{
-		disableInt();
-		if (proc == nullptr)
-			return;
-		StreamManager::DestoryStream(proc->keyboardStream);
-		StreamManager::DestoryStream(proc->mouseStream);
-
-		for (int i = 0; i < proc->childrenCount; i++)
-		{
-			proc->children[i]->state = KILL_REQUESTED;
-		}
-		processes.remove(proc);
-		free((char *)proc);
-		Serial::log("Killed Porcess [" + proc->name + "]\n");
-		enableInt();
-	}
-	void addThreadToProcess(thread_t *thread, process_t *proc)
-	{
-		if (thread == nullptr)
-			return;
-		proc->children[proc->childrenCount] = thread;
-		proc->childrenCount++;
-		thread->parent = (void *)proc;
-	}
-	process_t *parentProcess(thread_t *thread)
-	{
-		return (process_t *)thread->parent;
-	}
+	
 	void pauseThread(thread_t *t)
 	{
 		t->state = PAUSED;
@@ -223,8 +169,8 @@ namespace Scheduler
 	{
 		t->state = RUNNING;
 	}
-	process_t *activeProcess()
-	{
-		return (process_t *)processes.end();
+	void selfKill(){
+		killThread(Scheduler::getCurrentThread());
 	}
+	
 };
