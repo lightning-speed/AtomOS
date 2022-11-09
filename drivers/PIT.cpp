@@ -5,6 +5,8 @@
 #include <lib.h>
 uint64_t PIT::timeSinceBoot = 0;
 uint16_t PIT::divisor = 0;
+static uint32_t TIME_CHANGE_PER_CALL = 1000 / PIT_FREQUENCY;
+
 using namespace IO;
 namespace PIT
 {
@@ -35,7 +37,7 @@ namespace PIT
 	}
 	void setFrequency(uint64_t frequency)
 	{
-		PIT::setDivisor(div(PIT_CLOCKING_FREQUENCY, frequency));
+		//PIT::setDivisor(div(PIT_CLOCKING_FREQUENCY, frequency));
 	}
 	void sleep(uint32_t milliseconds)
 	{

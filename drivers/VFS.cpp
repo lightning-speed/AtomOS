@@ -1,20 +1,24 @@
 #include <VFS.h>
-#include <string.h>
+#include <String.h>
 #include <CGA.h>
 #include <Memory.h>
 #include <Serial.h>
 
 fnode *VFS::vfs_node;
+SpinLock VFS::spinLock;
+List VFS::OpenedFiles;
 char *paths[10] = {"sys/", "lib/"};
 namespace VFS
 {
 	void init()
 	{
 		vfs_node = (fnode *)malloc(sizeof(fnode));
+		vfs_node->size = 0;
+		vfs_node->type = DIR;
 	}
 	void mount(fnode *vn)
 	{
-		if (vn == nullptr)
+	if (vn == nullptr)
 			return;
 		for (uint32_t i = 0; i < vn->size; i++)
 		{
@@ -22,7 +26,7 @@ namespace VFS
 			vfs_node->size++;
 		}
 		free((char *)vn);
-		Serial::log("New FS node mounted");
+		//Serial::log("New FS node mounted");
 	}
 	int rename(fnode *file, char *name)
 	{
@@ -31,6 +35,7 @@ namespace VFS
 	}
 	int del(fnode *file)
 	{
+		spinLock.acquire();
 		free(file->content);
 		free((char *)file);
 		fnode *parent = (fnode *)file->parent;
@@ -45,6 +50,7 @@ namespace VFS
 				return 1;
 			}
 		}
+		spinLock.release();
 		return 0;
 	}
 	fnode *getChild(char *name, fnode *parent)
@@ -80,13 +86,14 @@ namespace VFS
 	fnode *createFile(char *name)
 	{
 		fnode *node = (fnode *)malloc(sizeof(fnode));
-		memcpy(node->name, name, strlen(name));
+		memcpy(node->name, name, 40);
 		node->size = 0;
 		return node;
 	}
 
 	fnode *openTree(char *pathc, char *prot)
 	{
+		spinLock.acquire();
 		char path[40];
 		memcpy(path, pathc, 40);
 		char *name = strtok(path, "/");
@@ -103,7 +110,6 @@ namespace VFS
 				if (prot[0] == 'r')
 					return nullptr;
 				n = createFile(name);
-				n->size = 0;
 				n->type = FILE;
 				n->parent = (uintptr_t)last;
 				file = n;
@@ -115,7 +121,7 @@ namespace VFS
 			if (name != nullptr && n != nullptr)
 				n->type = DIR;
 		}
-
+		spinLock.release();
 		return file;
 	}
 	fnode *open(char *path, char *prot)
@@ -125,14 +131,13 @@ namespace VFS
 			return vfs_node;
 		}
 		fnode *out = openTree(path, prot);
-		if (out == nullptr)
-			out = findFileUsingPaths(path);
+		
 		if (out != nullptr)
 		{
 			out->open = true;
+			OpenedFiles.push(out);
 			Serial::log("file opened: " + (string)(char *)out->name + "\n");
 		}
-
 		return out;
 	}
 	uint32_t write(fnode *f, int data)
@@ -167,7 +172,7 @@ namespace VFS
 		}
 		else
 		{
-			Serial::log("\nFILE node was null\n");
+			//Serial::log("\nFILE node was null\n");
 		}
 		return 0;
 	}
@@ -176,6 +181,7 @@ namespace VFS
 		if (node != nullptr)
 		{
 			node->open = false;
+			OpenedFiles.remove(node);
 			Serial::log("file closed: " + (string)(char *)node->name + "\n");
 			return 1;
 		}
@@ -187,8 +193,10 @@ namespace VFS
 	}
 	void read(char *ptr, uint32_t size, fnode *f)
 	{
-		if (f != nullptr && f->open)
-			memcpy(ptr, f->content, size);
+		if (f != nullptr && f->open){
+			memcpy(ptr, f->content+f->fileCounter, size);
+			f->fileCounter+=size;
+		}
 	}
 	fnode *findFileUsingPaths(char *name)
 	{
@@ -204,5 +212,8 @@ namespace VFS
 				return node;
 		}
 		return nullptr;
+	}
+	fnode * fromFNUM(uint32_t fnum){
+		return (fnode *)OpenedFiles.at(fnum);
 	}
 };

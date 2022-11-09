@@ -12,18 +12,12 @@ void Ramdisk::init()
 {
 
 	char *disk = Ramdisk::start;
-	fnode *tree = (fnode *)malloc(sizeof(fnode));
-	tree->size = 0;
-	tree->type = DIR;
-	VFS::mount(tree);
-	for (uint32_t i = 0;;)
+	for (uint32_t i = 0;;i+=sizeof(file_t))
 	{
 		file_t *file = (file_t *)(disk + i);
-		if (file->name[0] == 0)
-			return;
+		if(file->name[0]==0)return;
 		fnode *node = VFS::open(file->name, "w");
 		VFS::setBuffer(node, (char *)((uint32_t)(file->content) + disk), file->size);
-		i += sizeof(file_t);
 		VFS::close(node);
 	}
 }

@@ -32,7 +32,8 @@ namespace CGA
 	void printChar(char c, int x, int y)
 	{
 
-		WindowManager::drawTerminalAsciiChar(win, x, y, c, colors[CGA::screenColor]);
+		((char *)0xB8000)[(y*160)+(x*2)] = c;
+		((char *)0xB8000)[(y*160)+(x*2)+1] = CGA::screenColor;
 		if (x < 80)
 			CGA::setCursorPosition(x + 1, y);
 		else
@@ -60,7 +61,7 @@ namespace CGA
 			else
 				CGA::setCursorPosition(0, sy + 1);
 		}
-		if (sy >= 26)
+		if (sy >= 24)
 		{
 			clearScreen();
 		}
@@ -102,10 +103,46 @@ namespace CGA
 			}
 		}
 	}
+	void printf(char *s,char color){
+		CGA::screenColor = color;
+		CGA::print(s);
+		CGA::screenColor = 0x0f;
+	}
+	void printf(char * s)
+	{
+		for (uint32_t i = 0; i < strlen(s); i++)
+		{
+
+			if (s[i] == '\t')
+			{
+				for (int j = 0; j < 4; j++)
+					CGA::printChar(' ');
+				i++;
+			}
+			if (s[i] != '\n')
+			{
+				CGA::printChar(s[i], sx, sy);
+				sx++;
+			}
+			if (sx >= 80 || s[i] == '\n')
+			{
+				sx = 0;
+				sy++;
+				if (sx < 80)
+					CGA::setCursorPosition(sx, sy);
+				else
+					CGA::setCursorPosition(0, sy + 1);
+			}
+			if (sy >= 26)
+			{
+				clearScreen();
+			}
+		}
+	}
 
 	void clearScreen()
 	{
-		WindowManager::clear(win);
+		memset((char *)0xB8000,0,160*25);
 		sx = 0;
 		sy = 0;
 	}

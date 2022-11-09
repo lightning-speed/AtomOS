@@ -37,9 +37,9 @@ namespace Mouse
 	}
 	void mouseDown()
 	{
-		Stream *mouseStream = Scheduler::activeProcess()->mouseStream;
-		mouseStream->push(mouseX);
-		mouseStream->push(mouseY);
+		//Stream *mouseStream = Scheduler::activeProcess()->mouseStream;
+		//mouseStream->push(mouseX);
+		//mouseStream->push(mouseY);
 	}
 	static void wait(unsigned char type)
 	{

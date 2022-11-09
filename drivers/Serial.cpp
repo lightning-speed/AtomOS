@@ -6,11 +6,12 @@ using namespace IO;
 ComPort CurrentPort = 0x3F8;
 int serialx = 0;
 bool Serial::verboseOn = false;
+bool Serial::CGAverboseOn = false;
 namespace Serial
 {
 	int serial_received()
 	{
-		return inb(CurrentPort + 5) & 1;
+		return (int)(inb(CurrentPort + 5) & 1);
 	}
 
 	char read_serial()
@@ -18,11 +19,11 @@ namespace Serial
 		while (serial_received() == 0)
 			;
 
-		return inb(CurrentPort);
+		return (char)inb(CurrentPort);
 	}
 	int is_transmit_empty()
 	{
-		return inb(CurrentPort + 5) & 0x20;
+		return (int)(inb(CurrentPort + 5) & 0x20);
 	}
 
 	void write_serial(char a)
@@ -50,6 +51,9 @@ namespace Serial
 	{
 		uint32_t n = s.length();
 		char *buffer = s.buffer;
+		if(CGAverboseOn){
+			CGA::print(buffer);
+		}
 		for (uint32_t i = 0; i < n; i++)
 		{
 			write_serial(buffer[i]);

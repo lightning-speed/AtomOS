@@ -5,12 +5,12 @@
 #include <IDT.h>
 #include <Scheduler.h>
 #include "KeyboardScancodes.h"
+#include <Runtime.h>
 uint16_t ScanCode;
 bool CapsOn = false;
 bool ShiftPressed = false;
 bool CtrlPressed = false;
 int Keyboard::CharPressed = 0;
-extern process_t *kernel_stage2proc;
 namespace Keyboard
 {
 	void init()
@@ -41,21 +41,14 @@ namespace Keyboard
 				c = codes[ScanCode];
 			Keyboard::CharPressed = c;
 
-			process_t *proc = (process_t *)Scheduler::processes.end();
+			//process_t *proc = (process_t *)Scheduler::processes.end();
 			//THIS IS A TEMPERORY CODE AND IS JUST FOR TEST
 			if ((c == 'c' || c == 'C') && CtrlPressed == true)
-			{
-				if ((proc->name == "cmd.exe") == false)
-				{
-					Scheduler::killProcess(proc);
-					CGA::print("^C\n");
-				}
+			{				
+				Runtime::fullTrace(((thread_t *)Scheduler::threads.end()),((thread_t *)Scheduler::threads.end())->regs);
 			}
 
-			if (proc != nullptr)
-			{
-				proc->keyboardStream->push(c);
-			}
+			
 		}
 	}
 }

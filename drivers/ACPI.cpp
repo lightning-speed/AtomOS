@@ -35,7 +35,7 @@ namespace ACPI
 		{
 			// check checksum rsdpd
 			bptr = (char *)ptr;
-			for (i = 0; i < sizeof(struct RSDPtr); i++)
+			for (i = 0; i < (int)sizeof(struct RSDPtr); i++)
 			{
 				check += *bptr;
 				bptr++;
