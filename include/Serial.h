@@ -15,4 +15,5 @@ namespace Serial
 	void handler(register_t *regs);
 	void setup();
 	extern bool verboseOn;
+	extern bool CGAverboseOn;
 };

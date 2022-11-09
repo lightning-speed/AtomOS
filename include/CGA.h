@@ -6,6 +6,9 @@ namespace CGA
 	extern int sx;
 	void printChar(char c, int x, int y);
 	void print(string s);
+	void printf(char *s);
+
+	void printf(char *s,char color);
 	void print(string s, char color);
 	void clearScreen();
 	void printChar(char c);

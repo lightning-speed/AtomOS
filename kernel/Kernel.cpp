@@ -3,45 +3,57 @@
 #include <CGA.h>
 #include <GDT.h>
 #include <IDT.h>
-#include <IO.h>
 #include <PIC.h>
 #include <Keyboard.h>
 #include <PIT.h>
 #include <Scheduler.h>
 #include <FS.h>
 #include <Ramdisk.h>
-#include <Syscall.h>
-#include <Runtime.h>
-#include <CMOS.h>
 #include <Serial.h>
-#include <Sound.h>
 #include <VFS.h>
 #include <ACPI.h>
 #include <multiboot.h>
 #include <FB.h>
-#include <Mouse.h>
-#include "../Glib/Window.h"
 #include <BitmapImage.h>
+#include <Syscall.h>
+#include <SysInterface.h>
 #include <RMm.h>
+#include <ELF.h>
+#include <Runtime.h>
+
+void *__stack_chk_fail_local;
 
 void randomize_mem(uint32_t from, uint32_t till);
 void kernel_stage2();
 process_t *kernel_stage2proc;
+void meow(){
+
+	for(int i  = 0;;i++){
+		Scheduler::sleep(100);
+		CGA::print("shit");
+	}
+}
 extern "C" int kmain(uint32_t mb_sig, uint32_t mb_addr)
 {
-	//As Malloc is required everywhere we initalize it first
+	inInterrupt = true;
+	RMm::init();
+	CGA::clearScreen();
 	mm_init();
 	gdt_install();
 	idt_install();
 	PIC::init();
 	Serial::setup();
 	Serial::verboseOn = true;
-	//first thread is continued to where eip
-	thread_t *kernel_stage1 = Scheduler::create(nullptr, nullptr);
+
+	//first thread is continued to where eip was
+	thread_t *kernel_stage1 = Scheduler::createThread(nullptr,nullptr, nullptr);
+
+
+
 	Scheduler::start();
+
 	Keyboard::init();
 	Syscall::init();
-	Mouse::init();
 	install_interrupt_gates();
 
 	if (mb_sig == 0x2BADB002 && mb_addr < 0x100000)
@@ -54,44 +66,28 @@ extern "C" int kmain(uint32_t mb_sig, uint32_t mb_addr)
 		Ramdisk::start = (char *)mod->mod_start;
 		Serial::log((string) "Ramdisk loaded at:" + (int)Ramdisk::start + "\n");
 		Ramdisk::size = mod->mod_start - (uint32_t)Ramdisk::start;
-		FB::init((char *)(mbinfo->framebuffer_addr), mbinfo->framebuffer_width, mbinfo->framebuffer_height, mbinfo->framebuffer_pitch);
-		CGA::init();
 	}
-
-	kernel_stage2proc = Scheduler::createProcess("kernel_stage2", nullptr, (void *)kernel_stage2);
+	kernel_stage2proc = ProcessManager::create("Kernel_Proc",0,nullptr,nullptr,(void *)kernel_stage2);
+	ProcessManager::start(kernel_stage2proc);
 	enableInt();
-	//Kills this thread as no longer nedded
-	Scheduler::killThread(kernel_stage1);
-	while (1)
-		;
+
+	Scheduler::selfKill();
 	return 0;
 }
 
 void kernel_stage2()
 {
 	ACPI::init();
-	CGA::print("ACPI [Done]\n", 0x0d);
+	CGA::printf((char *)"ACPI [Done]\n", 0x0d);
 	VFS::init();
 	//Initfs will be mounted in the ramdisk init
 	Ramdisk::init();
-	CGA::print("Filesystem Mounted [Done]\n", 0x09);
-	fnode *fontFile = VFS::open("lib/unifont.bin", "r");
-	FB::loadFont(fontFile);
-	VFS::close(fontFile);
-	//Splash Screen
-	fnode *image = VFS::open("lib/icon.bmp", "r");
-	BitmapImage::drawImage(0, 0, image->content, image->size);
-	VFS::close(image);
-	Scheduler::sleep(2000);
-	CGA::clearScreen();
-	RMm::init();
-	process_t *proc = Runtime::exec("sys/cmd.exe", 0, nullptr, nullptr);
-
-	while (1)
-	{
-		Mouse::paintMouse();
-		Scheduler::sleep(50);
+	CGA::printf((char *)"Filesystem Mounted [Done]\n", 0x09);
+	Runtime::exec("f.exe",0,nullptr,nullptr);
+	for(;;){
+		
 	}
+
 }
 
 void randomize_mem(uint32_t from, uint32_t till)

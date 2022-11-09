@@ -3,6 +3,8 @@
 #include <CGA.h>
 #include <Scheduler.h>
 #include <Serial.h>
+#include <Process.h>
+
 #include <Runtime.h>
 
 void *interrupt_handlers[256];
@@ -47,7 +49,7 @@ struct idt_ptr idtp;
 
 void idt_set_gate(char vector, void *isr)
 {
-	struct idt_entry *descriptor = &idt[vector];
+	struct idt_entry *descriptor = (struct idt_entry *)&idt[(int)vector];
 
 	descriptor->base_lo = (unsigned int)isr & 0xFFFF;
 	descriptor->sel = 0x08;
@@ -94,6 +96,7 @@ extern "C" void interrupt_handler(register_t *regs)
 }
 extern "C" void exception_handler(register_t *regs)
 {
+	inInterrupt = true;
 	if (regs->int_no == 3)
 	{
 		end_interrupt();
@@ -108,9 +111,10 @@ extern "C" void exception_handler(register_t *regs)
 		{
 		}
 	}
-	Runtime::kill((process_t *)(Scheduler::getCurrentThread()->parent));
+	Runtime::kill((process_t *)(Scheduler::getCurrentThread()->parent),-121);
 	regs->eip = (uint32_t)after_exception;
 	end_interrupt();
+	inInterrupt = false;
 }
 void set_interrupt_handler(int interrupt_code, void *handler)
 {

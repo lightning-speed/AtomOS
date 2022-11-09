@@ -1,5 +1,6 @@
 #pragma once
 #include <stdint.h>
+#include <lib.h>
 enum ftype_t
 {
 	DIR = 1,
@@ -10,7 +11,7 @@ typedef struct
 	ftype_t type;
 	uintptr_t children[126];
 	uintptr_t parent;
-	char name[32];
+	char name[40];
 	uint32_t size;
 	char *content;
 	uint32_t cap;
@@ -22,6 +23,8 @@ typedef struct
 namespace VFS
 {
 	extern fnode *vfs_node;
+	extern SpinLock spinLock;
+	extern List OpenedFiles;
 	void init();
 	void mount(fnode *vfs_node);
 	int del(fnode *file);
@@ -38,4 +41,5 @@ namespace VFS
 	char *getNodeName(fnode *node, int index);
 	void read(char *ptr, uint32_t size, fnode *f);
 	fnode *findFileUsingPaths(char *name);
+	fnode * fromFNUM(uint32_t fnum);
 };

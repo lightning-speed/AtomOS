@@ -10,6 +10,7 @@
 #define MAX_PROCESSES 512
 enum state_t
 {
+	INITALIZED = 0,
 	RUNNING = 1,
 	SLEEPING = 2,
 	KILLED = 3,
@@ -24,12 +25,15 @@ enum priority_t
 };
 typedef struct
 {
+	int header;
 	register_t *regs;
 	char *stack;
 	state_t state;
 	uint64_t sleepTimeLeft;
 	priority_t priority;
 	void *parent;
+	bool locked;
+	uint64_t errno;
 } thread_t;
 typedef struct
 {
@@ -37,24 +41,14 @@ typedef struct
 	char **argv;
 	char **env;
 } pdata_t;
-typedef struct
-{
-	string name;
-	uint16_t pid;
-	thread_t *children[40];
-	uint8_t childrenCount;
-	pdata_t *data;
-	Stream *keyboardStream;
-	Stream *mouseStream;
 
-} process_t;
 
 namespace Scheduler
 {
 	extern List threads;
 	extern bool isScheduling;
-	extern thread_t *runningThreads[];
-	extern List processes;
+	extern List runningThreads;
+	extern SpinLock spinLock;
 	extern uint16_t currentThreadIndex;
 	extern uint64_t timePassedSinceReschedule;
 	extern uint16_t runningThreadCount;
@@ -62,7 +56,7 @@ namespace Scheduler
 
 	void start();
 	void idle();
-	thread_t *create(pdata_t *data, void *func);
+	thread_t *createThread(void * parentProcess,pdata_t *data, void *func);
 	void kill(thread_t *thread);
 	void sleep(thread_t *thread, uint32_t milliseconds);
 	void schedule(register_t *regs, uint64_t timePassed);
@@ -72,9 +66,12 @@ namespace Scheduler
 
 	extern inline void sleep(uint32_t milliseconds)
 	{
+
 		thread_t *thread = getCurrentThread();
-		if (thread == nullptr)
+
+		if (thread == nullptr||thread->state !=RUNNING ||thread->locked == true)
 			return;
+		
 		if (milliseconds > 10)
 			milliseconds -= 10;
 		thread->sleepTimeLeft = milliseconds;
@@ -82,16 +79,10 @@ namespace Scheduler
 		if (!inInterrupt)
 			asm volatile("hlt");
 	}
-	void removeThreadAt(uint16_t index);
+	void removeThread(thread_t * thread);
 	void killThread(thread_t *thread);
+	void selfKill();
 	uint16_t allocPID();
-	process_t *createProcess(string name);
-	process_t *createProcess(string name, pdata_t *data, void *func);
-	void addThreadToProcess(thread_t *thread, process_t *proc);
-	void pauseThread(thread_t *t);
-	void unpauseThread(thread_t *t);
-	void killProcess(process_t *proc);
-	process_t *activeProcess();
-	process_t *parentProcess(thread_t *thread);
+	
 	extern bool enabled;
 };
